@@ -4,6 +4,7 @@ namespace DefaultNamespace.ECS.Component
 {
     public struct RotationSpeed : IComponentData
     {
+        public float lifeTime;
         public float speed;
     }
 }

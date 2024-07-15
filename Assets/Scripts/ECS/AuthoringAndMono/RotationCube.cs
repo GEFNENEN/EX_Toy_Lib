@@ -15,7 +15,8 @@ namespace ECS.AuthoringAndMono
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent(entity, new RotationSpeed()
                 {
-                    speed = math.radians(authoring.speed)
+                    speed = math.radians(authoring.speed),
+                    lifeTime = 2f
                 });
             }
         }

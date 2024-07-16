@@ -16,7 +16,7 @@ namespace ECS.AuthoringAndMono
                 AddComponent(entity, new RotationSpeed()
                 {
                     speed = math.radians(authoring.speed),
-                    lifeTime = 2f
+                    lifeTime = 60f
                 });
             }
         }

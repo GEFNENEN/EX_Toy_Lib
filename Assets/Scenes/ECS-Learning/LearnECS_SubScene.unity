@@ -250,10 +250,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea14519aeafe4e5bad5714738b690dc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainThread: 1
-  IsJobEntity: 1
-  usePrefab: 1
+  MainThread: 0
+  IsJobEntity: 0
+  usePrefab: 0
   aspect: 0
+  ExecuteGameObjectSync: 1
 --- !u!4 &1768129521
 Transform:
   m_ObjectHideFlags: 0

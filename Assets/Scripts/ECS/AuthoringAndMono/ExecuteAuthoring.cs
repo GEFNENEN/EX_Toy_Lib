@@ -9,6 +9,7 @@ namespace ECS.AuthoringAndMono
         public bool IsJobEntity;
         public bool usePrefab;
         public bool aspect;
+        public bool ExecuteGameObjectSync;
         private class ExecuteAuthoringBaker : Baker<ExecuteAuthoring>
         {
             public override void Bake(ExecuteAuthoring authoring)
@@ -18,6 +19,7 @@ namespace ECS.AuthoringAndMono
                 if (authoring.IsJobEntity) AddComponent<IsJobEntity>(entity);
                 if (authoring.usePrefab) AddComponent<UsePrefab>(entity);
                 if (authoring.aspect) AddComponent<UseAspect>(entity);
+                if (authoring.ExecuteGameObjectSync) AddComponent<ExecuteGameObjectSync>(entity);
             }
         }
     }
@@ -36,5 +38,10 @@ namespace ECS.AuthoringAndMono
 
     public struct UseAspect : IComponentData
     {
+    }
+
+    public struct ExecuteGameObjectSync : IComponentData
+    {
+        
     }
 }

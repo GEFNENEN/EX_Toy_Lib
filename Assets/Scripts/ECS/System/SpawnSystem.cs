@@ -28,7 +28,7 @@ namespace ECS.System
             if (spinningCubeQuery.IsEmpty)
             {
                 var prefab = SystemAPI.GetSingleton<Spawner>().prefab;
-                var instances = state.EntityManager.Instantiate(prefab,1,Allocator.Temp);
+                var instances = state.EntityManager.Instantiate(prefab,5,Allocator.Temp);
     
                 foreach (var entity in instances)
                 {
@@ -56,6 +56,11 @@ namespace ECS.System
         public void OnDestroy(ref SystemState state)
         {
 
+        }
+        
+        public void OnFixedUpdate(ref SystemState state)
+        {
+            OnUpdate(ref state);
         }
     }
 }

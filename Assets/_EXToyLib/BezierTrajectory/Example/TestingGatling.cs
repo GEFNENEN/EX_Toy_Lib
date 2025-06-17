@@ -52,6 +52,8 @@ namespace _EXToyLib
                 bezierTrajectory = bullet.AddComponent<BezierTrajectoryController>();
             }
 
+            bezierTrajectory.bullet = bullet.transform; // 设置子弹的Transform
+            
             // 设置起点、终点和控制点
             bezierTrajectory.trajectoryConfig.startPoint = transform.position;
             bezierTrajectory.trajectoryConfig.endPoint = target.transform.position;
@@ -60,9 +62,9 @@ namespace _EXToyLib
             bezierTrajectory.trajectoryConfig.useAngleCalculation = true;
             // 角度随机值设置，范围0到设置的angle
             var random = new Random((uint)System.DateTime.Now.Ticks);
-            bezierTrajectory.trajectoryConfig.startAngle = new Vector3(0, random.NextFloat(0, angle), 0); // 设置发射角度
+            bezierTrajectory.trajectoryConfig.startAngle = new Vector3(0,random.NextFloat(0, angle) , random.NextFloat(0, angle)); // 设置发射角度
             // 设置控制点随机距离， 范围0到设置的bezierDistance
-            bezierTrajectory.trajectoryConfig.controlPointDistance = random.NextFloat(0, bezierDistance); // 设置控制点距离
+            bezierTrajectory.trajectoryConfig.controlPointDistance = bezierDistance; // 设置控制点距离
             
             // 注册自动销毁事件
             bezierTrajectory.RegisterOnPlayEnd(() =>

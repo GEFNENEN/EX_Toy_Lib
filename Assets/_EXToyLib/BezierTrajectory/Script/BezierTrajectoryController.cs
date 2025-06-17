@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace EXToyLib
@@ -15,7 +16,15 @@ namespace EXToyLib
 
         [Range(0, 10)] public float rotationDamping = 5.0f;
 
+        [Header("速度曲线")] public bool useSpeedCurve = true; // 速度曲线开关
+
         private bool _isPlaying;
+
+        // 结束播放事件
+        private Action _onPlayEnd;
+
+        // 开始播放事件
+        private Action _onPlayStart;
 
         private float _startTime = -1f;
 
@@ -24,40 +33,69 @@ namespace EXToyLib
             if (_isPlaying) UpdateTrajectory();
         }
 
-        // 在场景中绘制轨迹
         private void OnDrawGizmos()
         {
             if (!drawGizmos) return;
             trajectoryConfig.DrawGizmos();
         }
 
+        public void RegisterOnPlayStart(Action action)
+        {
+            _onPlayStart += action;
+        }
+
+        public void UnregisterOnPlayStart(Action action)
+        {
+            _onPlayStart -= action;
+        }
+
+        public void RegisterOnPlayEnd(Action action)
+        {
+            _onPlayEnd += action;
+        }
+
+        public void UnregisterOnPlayEnd(Action action)
+        {
+            _onPlayEnd -= action;
+        }
+
         // 更新轨迹预览
         public void UpdateTrajectory()
         {
             // 预览对象位置
-            if (bullet != null)
+            if (bullet == null) return;
+
+            if (_startTime < 0f)
+                trajectoryConfig.progress = 0f;
+            else
+                trajectoryConfig.progress = (Time.time - _startTime) / trajectoryConfig.time;
+
+            // 应用速度曲线重映射
+            var remappedProgress = useSpeedCurve
+                ? trajectoryConfig.RemapProgressBySpeedCurve(trajectoryConfig.progress)
+                : trajectoryConfig.progress;
+
+            bullet.position = GetPosition(remappedProgress);
+
+            if (alignToPath && trajectoryConfig.progress > 0.01f)
             {
-                if (_startTime < 0f)
-                    trajectoryConfig.progress = 0f;
-                else
-                    trajectoryConfig.progress = (Time.time - _startTime) / trajectoryConfig.time;
-                bullet.position = GetPosition(trajectoryConfig.progress);
-
-                if (alignToPath && trajectoryConfig.progress > 0.01f)
+                var tangent = trajectoryConfig.GetTangentAt(trajectoryConfig.progress);
+                // 跳过零向量避免报错
+                if (tangent.sqrMagnitude > 0.001f)
                 {
-                    var tangent = trajectoryConfig.GetTangentAt(trajectoryConfig.progress);
-
-                    // 跳过零向量避免报错
-                    if (tangent.sqrMagnitude > 0.001f)
-                    {
-                        var targetRot = Quaternion.LookRotation(tangent);
-                        transform.rotation = Quaternion.Slerp(
-                            transform.rotation,
-                            targetRot,
-                            rotationDamping * Time.deltaTime
-                        );
-                    }
+                    var targetRot = Quaternion.LookRotation(tangent);
+                    transform.rotation = Quaternion.Slerp(
+                        transform.rotation,
+                        targetRot,
+                        rotationDamping * Time.deltaTime
+                    );
                 }
+            }
+
+            // 自动停止
+            if (trajectoryConfig.progress >= 1f)
+            {
+                Stop();
             }
         }
 
@@ -71,9 +109,9 @@ namespace EXToyLib
         [Button]
         public void Play()
         {
-            if (_isPlaying) return;
             _isPlaying = true;
             _startTime = Time.time;
+            _onPlayStart?.Invoke();
             UpdateTrajectory();
         }
 
@@ -83,7 +121,7 @@ namespace EXToyLib
             _startTime = -1f;
             _isPlaying = false;
             trajectoryConfig.progress = 0f;
-            UpdateTrajectory();
+            _onPlayEnd?.Invoke();
         }
 
         [Button]

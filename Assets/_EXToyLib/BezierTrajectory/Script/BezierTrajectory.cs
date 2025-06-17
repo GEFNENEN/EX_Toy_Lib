@@ -16,13 +16,15 @@ namespace EXToyLib
 
         [Header("控制点设置")] [Tooltip("使用欧拉角自动计算控制点")]
         public bool useAngleCalculation = true;
-
+        
         [Tooltip("相对于起点的偏移角度")] public Vector3 startAngle = Vector3.zero;
         [Tooltip("控制点距离起点的距离")] public float controlPointDistance = 5f;
 
         [Space(10)] [Tooltip("手动设置控制点")] public List<Vector3> controlPoints = new();
 
         [Space(10)] [Tooltip("子弹运动时间")] public float time = 1f;
+
+        [Header("速度曲线控制")] public AnimationCurve speedCurve = AnimationCurve.Linear(0, 0, 1, 1); // 默认匀速曲线
 
         // 计算贝塞尔曲线上的点
         public Vector3 Evaluate()
@@ -106,25 +108,57 @@ namespace EXToyLib
             return result;
         }
 
-        public Vector3 GetTangentAt(float t) {
-            List<Vector3> points = GetControlPoints();
-            int n = points.Count;
+        public Vector3 GetTangentAt(float t)
+        {
+            var points = GetControlPoints();
+            var n = points.Count;
 
             // 二阶贝塞尔（一个控制点）
-            if (n == 1) {
-                return 2 * (1 - t) * (points[0] - startPoint) 
+            if (n == 1)
+                return 2 * (1 - t) * (points[0] - startPoint)
                        + 2 * t * (endPoint - points[0]);
-            }
             // 三阶贝塞尔（两个控制点）
-            if (n == 2) {
+            if (n == 2)
                 return 3 * Mathf.Pow(1 - t, 2) * (points[0] - startPoint)
                        + 6 * (1 - t) * t * (points[1] - points[0])
                        + 3 * Mathf.Pow(t, 2) * (endPoint - points[1]);
-            }
             // 线性路径或无控制点
             return (endPoint - startPoint).normalized;
         }
-        
+
+        // 根据速度曲线重映射进度值
+        public float RemapProgressBySpeedCurve(float rawProgress)
+        {
+            // 确保曲线有效（避免空引用）
+            if (speedCurve == null || speedCurve.length == 0) speedCurve = AnimationCurve.Linear(0, 0, 1, 1);
+
+            // 采样曲线值（范围[0,1]映射到速度权重）
+            var speedFactor = Mathf.Clamp01(speedCurve.Evaluate(rawProgress));
+
+            // 积分计算变速后的实际进度（模拟非均匀运动）
+            return IntegrateSpeedCurve(rawProgress, speedFactor);
+        }
+
+        // 速度曲线积分（核心算法）
+        private float IntegrateSpeedCurve(float t, float currentSpeed)
+        {
+            // 简化的梯形积分法（精度足够）
+            const int SEGMENTS = 20;
+            var integral = 0f;
+            var delta = t / SEGMENTS;
+
+            for (var i = 0; i < SEGMENTS; i++)
+            {
+                var t0 = i * delta;
+                var t1 = (i + 1) * delta;
+                var speed0 = speedCurve.Evaluate(t0);
+                var speed1 = speedCurve.Evaluate(t1);
+                integral += (speed0 + speed1) * 0.5f * delta; // 梯形面积
+            }
+
+            return integral;
+        }
+
         // 在场景中绘制轨迹预览
         public void DrawGizmos()
         {

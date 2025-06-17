@@ -106,6 +106,25 @@ namespace EXToyLib
             return result;
         }
 
+        public Vector3 GetTangentAt(float t) {
+            List<Vector3> points = GetControlPoints();
+            int n = points.Count;
+
+            // 二阶贝塞尔（一个控制点）
+            if (n == 1) {
+                return 2 * (1 - t) * (points[0] - startPoint) 
+                       + 2 * t * (endPoint - points[0]);
+            }
+            // 三阶贝塞尔（两个控制点）
+            if (n == 2) {
+                return 3 * Mathf.Pow(1 - t, 2) * (points[0] - startPoint)
+                       + 6 * (1 - t) * t * (points[1] - points[0])
+                       + 3 * Mathf.Pow(t, 2) * (endPoint - points[1]);
+            }
+            // 线性路径或无控制点
+            return (endPoint - startPoint).normalized;
+        }
+        
         // 在场景中绘制轨迹预览
         public void DrawGizmos()
         {

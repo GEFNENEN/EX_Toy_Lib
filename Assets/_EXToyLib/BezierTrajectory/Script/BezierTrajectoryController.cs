@@ -10,6 +10,11 @@ namespace EXToyLib
         [Header("调试选项")] public bool drawGizmos = true;
 
         [Header("运动子弹")] public Transform bullet;
+
+        [Header("朝向控制")] public bool alignToPath = true; // 是否沿轨迹切线方向旋转
+
+        [Range(0, 10)] public float rotationDamping = 5.0f;
+
         private bool _isPlaying;
 
         private float _startTime = -1f;
@@ -37,6 +42,22 @@ namespace EXToyLib
                 else
                     trajectoryConfig.progress = (Time.time - _startTime) / trajectoryConfig.time;
                 bullet.position = GetPosition(trajectoryConfig.progress);
+
+                if (alignToPath && trajectoryConfig.progress > 0.01f)
+                {
+                    var tangent = trajectoryConfig.GetTangentAt(trajectoryConfig.progress);
+
+                    // 跳过零向量避免报错
+                    if (tangent.sqrMagnitude > 0.001f)
+                    {
+                        var targetRot = Quaternion.LookRotation(tangent);
+                        transform.rotation = Quaternion.Slerp(
+                            transform.rotation,
+                            targetRot,
+                            rotationDamping * Time.deltaTime
+                        );
+                    }
+                }
             }
         }
 

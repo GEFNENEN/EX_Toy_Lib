@@ -10,13 +10,15 @@ namespace EXToyLib
     [Serializable]
     public class BezierTrajectory
     {
+        private const int SEGMENTS = 20;
+        
         [Header("基础参数")] public Vector3 startPoint;
         public Vector3 endPoint;
         [Range(0f, 1f)] public float progress;
 
         [Header("控制点设置")] [Tooltip("使用欧拉角自动计算控制点")]
         public bool useAngleCalculation = true;
-        
+
         [Tooltip("相对于起点的偏移角度")] public Vector3 startAngle = Vector3.zero;
         [Tooltip("控制点距离起点的距离")] public float controlPointDistance = 5f;
 
@@ -136,14 +138,13 @@ namespace EXToyLib
             var speedFactor = Mathf.Clamp01(speedCurve.Evaluate(rawProgress));
 
             // 积分计算变速后的实际进度（模拟非均匀运动）
-            return IntegrateSpeedCurve(rawProgress, speedFactor);
+            return IntegrateSpeedCurve(rawProgress);
         }
 
         // 速度曲线积分（核心算法）
-        private float IntegrateSpeedCurve(float t, float currentSpeed)
+        private float IntegrateSpeedCurve(float t)
         {
             // 简化的梯形积分法（精度足够）
-            const int SEGMENTS = 20;
             var integral = 0f;
             var delta = t / SEGMENTS;
 

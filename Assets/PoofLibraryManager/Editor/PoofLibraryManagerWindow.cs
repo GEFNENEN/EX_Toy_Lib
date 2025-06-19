@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace PoofLibraryManager.Editor
 {
@@ -112,13 +115,16 @@ namespace PoofLibraryManager.Editor
         // 状态信息类
         public class StatusInfo
         {
-            [ShowInInspector, DisplayAsString]
-            public string Message => File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath))
-                ? "目录配置加载成功"
-                : "未找到配置文件";
+            private bool ExistMenuJson =>
+                File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath));
+            
+            [ShowInInspector, DisplayAsString,HideLabel]
+            public string Message => ExistMenuJson ? "目录配置加载成功" : "未找到配置文件";
 
+            
+            [ShowIf(nameof(ExistMenuJson))]
             [Button(ButtonSizes.Large), GUIColor(0.4f, 0.8f, 1f)]
-            public void CreateConfigTemplate()
+            public void DownloadMenuJson()
             {
                 string directory = Path.Combine(Application.dataPath, "_PoofLibrary");
 
@@ -163,7 +169,8 @@ namespace PoofLibraryManager.Editor
         }
 
         // 窗口首页内容
-        [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE)] [HideLabel] [DisplayAsString, TextArea(1, 20)]
+        [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE_SUB)] 
+        [HideLabel,DisplayAsString(Overflow = true),TextArea(minLines: 3, maxLines: 10)]
         public string WelcomeMessage = PoofLibraryConstParam.POOF_LIB_HOST_MSG;
 
         [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE)]
@@ -180,5 +187,91 @@ namespace PoofLibraryManager.Editor
 
             EditorUtility.RevealInFinder(directory);
         }
+
+
+        // 实例引用用于下载状态更新
+    private static PoofLibraryManagerWindow instance;
+    public static PoofLibraryManagerWindow Instance => instance;
+    
+    private bool isDownloading;
+    private UnityWebRequest downloadRequest;
+    
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        instance = this;
+    }
+    
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (instance == this) instance = null;
+        
+        // 确保取消下载请求
+        if (isDownloading && downloadRequest != null)
+        {
+            downloadRequest.Abort();
+        }
+    }
+    
+    public void StartDownload(string url)
+    {
+        if (isDownloading) return;
+        
+        isDownloading = true;
+        EditorCoroutineUtility.StartCoroutineOwnerless(DownloadMenuConfig(url));
+    }
+    
+    private IEnumerator DownloadMenuConfig(string url)
+    {
+        // 确保目录存在
+        string directory = Path.Combine(Application.dataPath, "_PoofLibrary");
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+        
+        string downloadStatus = "开始下载配置文件...";
+        float progress = 0f;
+        
+        using (downloadRequest = UnityWebRequest.Get(url))
+        {
+            // 添加下载进度回调
+            downloadRequest.SendWebRequest();
+            
+            while (!downloadRequest.isDone)
+            {
+                progress = downloadRequest.downloadProgress;
+                downloadStatus = $"下载中... {Mathf.RoundToInt(progress * 100)}%";
+                yield return null;
+            }
+            
+            // 下载完成
+            if (downloadRequest.result == UnityWebRequest.Result.Success)
+            {
+                string savePath = Path.Combine(directory, "menu.json");
+                File.WriteAllText(savePath, downloadRequest.downloadHandler.text);
+                
+                downloadStatus = "配置文件下载成功！";
+                progress = 1f;
+                
+                // 短暂显示完成状态
+                yield return new WaitForSeconds(1f);
+                
+                // 刷新资源数据库
+                AssetDatabase.Refresh();
+                
+                // 重新加载菜单
+                ForceMenuTreeRebuild();
+            }
+            else
+            {
+                downloadStatus = $"下载失败: {downloadRequest.error}";
+            }
+        }
+        
+        isDownloading = false;
+        downloadRequest = null;
+    }
     }
 }

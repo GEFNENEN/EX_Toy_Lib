@@ -10,13 +10,12 @@ namespace PoofLibraryManager.Editor
 {
     public class PoofLibraryManagerWindow : OdinMenuEditorWindow
     {
-        private const string MenuPath = "Assets/_PoofLibrary/menu.json";
 
-        [UnityEditor.MenuItem("Tools/Poof Library Manager")]
+        [UnityEditor.MenuItem("EX_Tools/Poof Library Manager")]
         private static void OpenWindow()
         {
             var window = GetWindow<PoofLibraryManagerWindow>();
-            window.titleContent = new GUIContent("资源目录管理器");
+            window.titleContent = new GUIContent(PoofLibraryConstParam.POOF_LIB_MGR);
             window.minSize = new Vector2(800, 600);
             window.Show();
         }
@@ -58,7 +57,7 @@ namespace PoofLibraryManager.Editor
 
         private MenuConfig LoadMenuConfig()
         {
-            string fullPath = Path.Combine(Application.dataPath, "../", MenuPath);
+            string fullPath = Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath);
 
             if (!File.Exists(fullPath))
             {
@@ -84,7 +83,7 @@ namespace PoofLibraryManager.Editor
                 return null;
 
             // 尝试加载资源
-            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+            var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
 
             if (asset == null)
             {
@@ -114,7 +113,7 @@ namespace PoofLibraryManager.Editor
         public class StatusInfo
         {
             [ShowInInspector, DisplayAsString]
-            public string Message => File.Exists(Path.Combine(Application.dataPath, "../", MenuPath))
+            public string Message => File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath))
                 ? "目录配置加载成功"
                 : "未找到配置文件";
 
@@ -164,17 +163,11 @@ namespace PoofLibraryManager.Editor
         }
 
         // 窗口首页内容
-        [BoxGroup("欢迎使用资源目录管理器")]
-        [HideLabel]
-        [DisplayAsString,TextArea(1,20)]
-        public string WelcomeMessage = "此工具用于管理项目资源目录\n"
-                                       + "1. 创建Assets/_PoofLibrary/menu.json文件\n"
-                                       + "2. 按照JSON格式配置资源目录\n"
-                                       + "3. 左侧菜单将自动显示配置的资源目录";
+        [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE)] [HideLabel] [DisplayAsString, TextArea(1, 20)]
+        public string WelcomeMessage = PoofLibraryConstParam.POOF_LIB_HOST_MSG;
 
-        [BoxGroup("欢迎使用资源目录管理器")]
+        [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE)]
         [Button("打开配置目录", ButtonSizes.Large)]
-        [PropertyOrder(-1)]
         public void OpenConfigFolder()
         {
             string directory = Path.Combine(Application.dataPath, "_PoofLibrary");

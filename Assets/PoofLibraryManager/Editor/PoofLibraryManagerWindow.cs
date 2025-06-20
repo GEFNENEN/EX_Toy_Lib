@@ -27,8 +27,8 @@ namespace PoofLibraryManager.Editor
         {
             OdinMenuTree tree = new OdinMenuTree(supportsMultiSelect: false)
             {
-                { "首页", this, EditorIcons.House },
-                { "状态", new StatusInfo(), EditorIcons.Info }
+                { "首页", new PoofLibraryHostPage(), EditorIcons.House },
+                { "状态", new PoofLibrarySettingPage(), EditorIcons.Info }
             };
 
             tree.DefaultMenuStyle.Height = 30;
@@ -111,83 +111,6 @@ namespace PoofLibraryManager.Editor
             public string assetPath;
             [TextArea] public string description;
         }
-
-        // 状态信息类
-        public class StatusInfo
-        {
-            private bool ExistMenuJson =>
-                File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath));
-            
-            [ShowInInspector, DisplayAsString,HideLabel]
-            public string Message => ExistMenuJson ? "目录配置加载成功" : "未找到配置文件";
-
-            
-            [ShowIf(nameof(ExistMenuJson))]
-            [Button(ButtonSizes.Large), GUIColor(0.4f, 0.8f, 1f)]
-            public void DownloadMenuJson()
-            {
-                string directory = Path.Combine(Application.dataPath, "_PoofLibrary");
-
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                    AssetDatabase.Refresh();
-                }
-
-                string fullPath = Path.Combine(directory, "menu.json");
-
-                if (!File.Exists(fullPath))
-                {
-                    MenuConfig config = new MenuConfig
-                    {
-                        menuItems = new List<MenuItem>
-                        {
-                            new MenuItem
-                            {
-                                menuPath = "示例/角色模型",
-                                assetPath = "Assets/Characters/Hero.prefab",
-                                description = "主角角色模型"
-                            },
-                            new MenuItem
-                            {
-                                menuPath = "示例/武器资源",
-                                assetPath = "Assets/Weapons/Sword.prefab",
-                                description = "基础武器预制体"
-                            }
-                        }
-                    };
-
-                    File.WriteAllText(fullPath, JsonUtility.ToJson(config, true));
-                    AssetDatabase.Refresh();
-                    Debug.Log($"已创建示例配置: {fullPath}");
-                }
-                else
-                {
-                    Debug.LogWarning("配置文件已存在");
-                }
-            }
-        }
-
-        // 窗口首页内容
-        [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE_SUB)] 
-        [HideLabel,DisplayAsString(Overflow = true),TextArea(minLines: 3, maxLines: 10)]
-        public string WelcomeMessage = PoofLibraryConstParam.POOF_LIB_HOST_MSG;
-
-        [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE)]
-        [Button("打开配置目录", ButtonSizes.Large)]
-        public void OpenConfigFolder()
-        {
-            string directory = Path.Combine(Application.dataPath, "_PoofLibrary");
-
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-                AssetDatabase.Refresh();
-            }
-
-            EditorUtility.RevealInFinder(directory);
-        }
-
 
         // 实例引用用于下载状态更新
     private static PoofLibraryManagerWindow instance;

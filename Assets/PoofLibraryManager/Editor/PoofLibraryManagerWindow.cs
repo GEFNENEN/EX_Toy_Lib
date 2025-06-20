@@ -28,7 +28,7 @@ namespace PoofLibraryManager.Editor
             OdinMenuTree tree = new OdinMenuTree(supportsMultiSelect: false)
             {
                 { "首页", new PoofLibraryHostPage(), EditorIcons.House },
-                { "状态", new PoofLibrarySettingPage(), EditorIcons.Info }
+                { "状态", PoofLibrarySetting.Instance, EditorIcons.Info }
             };
 
             tree.DefaultMenuStyle.Height = 30;
@@ -60,7 +60,7 @@ namespace PoofLibraryManager.Editor
 
         private MenuConfig LoadMenuConfig()
         {
-            string fullPath = Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath);
+            string fullPath = Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.DEFAULT_MENU_PATH);
 
             if (!File.Exists(fullPath))
             {

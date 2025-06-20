@@ -10,130 +10,155 @@ namespace PoofLibraryManager.Editor
 {
     public enum ConnectionStatus
     {
-        [LabelText("待检测")]
-        Pending,
-        [LabelText("检测中")]
-        Checking,
-        [LabelText("连接成功")]
-        Success,
-        [LabelText("连接失败")]
-        Failed
+        [LabelText("待检测")] Pending,
+        [LabelText("检测中")] Checking,
+        [LabelText("连接成功")] Success,
+        [LabelText("连接失败")] Failed
     }
-    
+
     public class PoofLibrarySettingPage
-    {       
-        private bool isTestingConnection;
+    {
         private double connectionStartTime;
-
-        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)] 
-        [ShowInInspector,LabelText("连接仓库地址"),LabelWidth(150)]
-        [DisplayAsString(EnableRichText = true)]
-        private string GitRepoUrl = $"<color=white>{PoofLibraryConstParam.GIT_REPO_URL}</color>";
+        private ConnectionStatus connectionStatus = ConnectionStatus.Pending;
+        private string debugUrl;
+        private bool isTestingConnection;
+        private double responseTime;
         
-        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)] 
-        [InfoBox("访问令牌(可选):\n• 私有仓库必须提供\n• 避免GitHub速率限制\n• 创建地址: https://github.com/settings/tokens")]
-        [ShowInInspector,LabelText("GitHub 令牌"),LabelWidth(150)]
-        private string gitToken = "";
-
-        [Title("网络状态", Bold = false)] 
+        [Title("网络状态", Bold = false)]
         [VerticalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1)]
-        [ShowInInspector,HideLabel,ReadOnly,TextArea(1,20)]
+        [ShowInInspector]
+        [HideLabel]
+        [ReadOnly]
+        [TextArea(1, 20)]
         [PropertyOrder(1)]
         private string connectionMessage = "准备测试连接";
         
+
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [ShowInInspector]
+        [LabelText("连接仓库地址")]
+        [LabelWidth(150)]
+        [DisplayAsString(EnableRichText = true)]
+        private string GitRepoUrl = $"<color=white>{PoofLibraryConstParam.DEFAULT_GIT_REPO_URL}</color>";
+
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [InfoBox("访问令牌(可选):\n• 私有仓库必须提供\n• 避免GitHub速率限制\n• 创建地址: https://github.com/settings/tokens")]
+        [ShowInInspector]
+        [LabelText("GitHub 令牌")]
+        [LabelWidth(150)]
+        private string gitToken = "";
+
+        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION)]
+        [PropertyOrder(3)]
+        [ShowInInspector]
+        [DisplayAsString(EnableRichText = true)]
+        [HideLabel]
+        private string connectionInfo => $"<color=orange>状态:{connectionStatus}</color>  响应时间:{responseTime:0.00}ms";
+
+        // 当前poof lib目录状态：
+        // 1.目录版本号; 2.按钮：下载目录/打开目录文件夹
+        [Title("目录", Bold = false)]
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [ShowInInspector]
+        [DisplayAsString]
+        [PropertyOrder(6)]
+        [LabelText("目录路径")]
+        [LabelWidth(150)]
+        public string Message => ExistMenuJson ? PoofLibraryConstParam.DEFAULT_MENU_PATH : "未找到配置文件";
+
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [ShowInInspector]
+        [DisplayAsString]
+        [LabelText("目录版本")]
+        [LabelWidth(150)]
+        [PropertyOrder(7)]
+        [ShowIf(nameof(ExistMenuJson))]
+        public string DefaultMenuVersion => PoofLibraryConstParam.DEFAULT_MENU_PATH;
+
+        private bool ExistMenuJson =>
+            File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.DEFAULT_MENU_PATH));
+
         [VerticalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1)]
-        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION,width:150)]
+        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION, 150)]
         [PropertyOrder(2)]
-        [Button("检测网络连接",ButtonSizes.Medium)]
+        [Button("检测网络连接", ButtonSizes.Medium)]
         public void CheckConnectionToGitRepo()
         {
             if (isTestingConnection) return;
-        
+
             connectionStatus = ConnectionStatus.Checking;
             connectionMessage = "正在测试连接...";
             connectionStartTime = EditorApplication.timeSinceStartup;
-        
+
             // 生成 URL
-            debugUrl = FormatGitHubUrl(PoofLibraryConstParam.GIT_REPO_RAW_URL,PoofLibraryConstParam.MenuPath,gitToken);
-        
+            debugUrl = FormatGitHubUrl(PoofLibraryConstParam.GIT_REPO_RAW_URL, PoofLibraryConstParam.DEFAULT_MENU_PATH,
+                gitToken);
+
             isTestingConnection = true;
             EditorCoroutineHelper.Start(TestConnectionCoroutine());
         }
 
-        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION)]
-        [PropertyOrder(3)]
-        [ShowInInspector, DisplayAsString(EnableRichText = true), HideLabel]
-        private string connectionInfo => $"<color=orange>状态:{connectionStatus}</color>  响应时间:{responseTime:0.00}ms";
-        
-        private string debugUrl;
-        private ConnectionStatus connectionStatus = ConnectionStatus.Pending;
-        private double responseTime = 0;
-        
         // 格式化 GitHub URL
-        private string FormatGitHubUrl(string repoUrl,string path, string token = "")
+        private string FormatGitHubUrl(string repoUrl, string path, string token = "")
         {
-            string encodedPath = path.Replace(" ", "%20");
+            var encodedPath = path.Replace(" ", "%20");
             encodedPath = UnityWebRequest.EscapeURL(encodedPath)
                 .Replace("%3A", ":")
                 .Replace("%2F", "/")
                 .Replace("%5C", "/");
-            
-            string url = $"{repoUrl}/{encodedPath}";
-            
+
+            var url = $"{repoUrl}/{encodedPath}";
+
             if (!string.IsNullOrWhiteSpace(token))
                 url += $"?token={token}";
-        
+
             return url;
         }
 
-        
+
         // 测试连接协程
         private IEnumerator TestConnectionCoroutine()
         {
-            using (UnityWebRequest request = UnityWebRequest.Head(debugUrl))
+            using (var request = UnityWebRequest.Head(debugUrl))
             {
                 // 设置请求参数
                 request.timeout = 10;
                 request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
-            
+
                 // 开始请求
-                UnityWebRequestAsyncOperation operation = request.SendWebRequest();
-            
-                // 更新状态
+                var operation = request.SendWebRequest();
+
                 while (!operation.isDone)
                 {
                     connectionMessage = $"正在连接... ({Mathf.FloorToInt(request.downloadProgress * 100)}%)";
                     yield return null;
                 }
-            
+
                 // 计算响应时间
-                double totalTime = (EditorApplication.timeSinceStartup - connectionStartTime) * 1000;
+                var totalTime = (EditorApplication.timeSinceStartup - connectionStartTime) * 1000;
                 responseTime = totalTime;
-            
-                // 处理结果
+
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     connectionStatus = ConnectionStatus.Success;
-                
+
                     if (request.responseCode == 200)
-                    {
-                        connectionMessage = $"✅ 连接成功！\n" +
-                                            $"HTTP 状态: 200 OK\n" +
+                        connectionMessage = $"测试地址[{debugUrl}]\n" +
+                                            $"连接成功！\n" +
+                                            "HTTP 状态: 200 OK\n" +
                                             $"响应时间: {totalTime:0} ms";
-                    }
                     else
-                    {
-                        connectionMessage = $"⚠️ 连接成功但文件可能不存在\n" +
+                        connectionMessage = $"测试地址[{debugUrl}]\n" +
+                                            $"连接成功但文件可能不存在\n" +
                                             $"HTTP 状态: {request.responseCode}\n" +
                                             $"响应时间: {totalTime:0} ms";
-                    }
                 }
                 else
                 {
                     connectionStatus = ConnectionStatus.Failed;
                     connectionMessage = HandleConnectionError(request, debugUrl);
                 }
-            
+
                 isTestingConnection = false;
             }
         }
@@ -143,44 +168,32 @@ namespace PoofLibraryManager.Editor
         {
             return request.responseCode switch
             {
-                401 or 403 => $"🚫 访问被拒绝 (HTTP {request.responseCode})\n" +
-                              $"• 私有仓库？请添加 GitHub 令牌",
-            
-                404 => $"🔍 文件未找到 (HTTP 404)\n" +
-                       $"• 检查文件路径: {PoofLibraryConstParam.MenuPath}",
-            
-                429 => $"⚠️ GitHub 速率限制\n" +
-                       $"• 添加 GitHub 令牌可提高限制",
-            
-                _ when request.result == UnityWebRequest.Result.ConnectionError => 
-                    $"🌐 网络连接失败\n" +
-                    $"请检查网络连接，DNS是否正常。",
-                    //$"• 尝试在浏览器中打开: {sanitizedUrl}",
-            
-                _ => $"❌ 连接失败: {request.error} (HTTP {request.responseCode})"
+                401 or 403 => $"测试地址[{debugUrl}]\n" +
+                              $"访问被拒绝 (HTTP {request.responseCode})\n" +
+                              "• 私有仓库？请添加 GitHub 令牌",
+
+                404 => $"测试地址[{debugUrl}]\n" +
+                       "文件未找到 (HTTP 404)\n" +
+                       $"• 检查文件路径: {PoofLibraryConstParam.DEFAULT_MENU_PATH}",
+
+                429 => $"测试地址[{debugUrl}]\n" +
+                       "\u26a0GitHub 速率限制\n" +
+                       "• 添加 GitHub 令牌可提高限制",
+
+                _ when request.result == UnityWebRequest.Result.ConnectionError =>
+                    $"测试地址[{debugUrl}]\n" +
+                    "网络连接失败\n" +
+                    "请检查网络连接，DNS是否正常。",
+                //$"• 尝试在浏览器中打开: {sanitizedUrl}",
+
+                _ => $"测试地址[{debugUrl}]\n" +$"连接失败: {request.error} (HTTP {request.responseCode})"
             };
         }
-        
-        // 当前poof lib目录状态：
-        // 1.目录版本号; 2.按钮：下载目录/打开目录文件夹
-        [Title("目录", Bold = false)] 
-        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
-        [ShowInInspector,DisplayAsString]
-        [PropertyOrder(6)]
-        [LabelText("目录路径"), LabelWidth(150)]
-        public string Message => ExistMenuJson ? PoofLibraryConstParam.MenuPath : "未找到配置文件";
 
-        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
-        [ShowInInspector, DisplayAsString]
-        [LabelText("目录版本"), LabelWidth(150)]
-        [PropertyOrder(7)]
-        [ShowIf(nameof(ExistMenuJson))]
-        public string menuVersion => PoofLibraryConstParam.MenuPath;
-        
         [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
         [HideIf(nameof(ExistMenuJson))]
         [PropertyOrder(8)]
-        [Button(ButtonSizes.Large,Name = "下载目录")]
+        [Button(ButtonSizes.Large, Name = "下载目录")]
         [GUIColor(0.4f, 0.8f, 1f)]
         public void DownloadMenuJson()
         {
@@ -224,8 +237,10 @@ namespace PoofLibraryManager.Editor
                 Debug.LogWarning("配置文件已存在");
             }
         }
-        
-        private bool ExistMenuJson =>
-            File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath));
+
+
+
+        [Title("连接仓库配置",Bold = false)]
+        public PoofLibrarySetting Setting;
     }
 }

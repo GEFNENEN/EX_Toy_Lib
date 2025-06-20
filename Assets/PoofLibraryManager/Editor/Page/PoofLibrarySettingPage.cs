@@ -25,10 +25,6 @@ namespace PoofLibraryManager.Editor
         private bool isTestingConnection;
         private double connectionStartTime;
 
-        
-        // 当前poof lib目录状态：
-        // 1.目录版本号; 2.按钮：下载目录/打开目录文件夹
-
         [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)] 
         [ShowInInspector,LabelText("连接仓库地址"),LabelWidth(150)]
         [DisplayAsString(EnableRichText = true)]
@@ -38,11 +34,16 @@ namespace PoofLibraryManager.Editor
         [InfoBox("访问令牌(可选):\n• 私有仓库必须提供\n• 避免GitHub速率限制\n• 创建地址: https://github.com/settings/tokens")]
         [ShowInInspector,LabelText("GitHub 令牌"),LabelWidth(150)]
         private string gitToken = "";
-        
-        
-        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1,CenterLabel = true)]
-        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION,width:150)]
+
+        [Title("网络状态", Bold = false)] 
+        [VerticalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1)]
+        [ShowInInspector,HideLabel,ReadOnly,TextArea(1,20)]
         [PropertyOrder(1)]
+        private string connectionMessage = "准备测试连接";
+        
+        [VerticalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1)]
+        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION,width:150)]
+        [PropertyOrder(2)]
         [Button("检测网络连接",ButtonSizes.Medium)]
         public void CheckConnectionToGitRepo()
         {
@@ -60,20 +61,13 @@ namespace PoofLibraryManager.Editor
         }
 
         [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION)]
-        [PropertyOrder(2)]
+        [PropertyOrder(3)]
         [ShowInInspector, DisplayAsString(EnableRichText = true), HideLabel]
         private string connectionInfo => $"<color=orange>状态:{connectionStatus}</color>  响应时间:{responseTime:0.00}ms";
         
         private string debugUrl;
         private ConnectionStatus connectionStatus = ConnectionStatus.Pending;
         private double responseTime = 0;
-        
-        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1)]
-        [ShowInInspector,HideLabel,ReadOnly,TextArea(1,20)]
-        [PropertyOrder(3)]
-        [ShowIf("@connectionStatus!=ConnectionStatus.Pending")]
-        private string connectionMessage = "准备测试连接";
-        
         
         // 格式化 GitHub URL
         private string FormatGitHubUrl(string repoUrl,string path, string token = "")
@@ -147,8 +141,6 @@ namespace PoofLibraryManager.Editor
         // 处理连接错误
         private string HandleConnectionError(UnityWebRequest request, string url)
         {
-            string sanitizedUrl = SanitizeUrl(url);
-        
             return request.responseCode switch
             {
                 401 or 403 => $"🚫 访问被拒绝 (HTTP {request.responseCode})\n" +
@@ -169,48 +161,26 @@ namespace PoofLibraryManager.Editor
             };
         }
         
-        // 清理URL（隐藏令牌）
-        private string SanitizeUrl(string url)
-        {
-            return url.Contains("?token=") ? 
-                url.Substring(0, url.IndexOf("?token=")) + "?token=[REDACTED]" : 
-                url;
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        private bool ExistMenuJson =>
-            File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath));
+        // 当前poof lib目录状态：
+        // 1.目录版本号; 2.按钮：下载目录/打开目录文件夹
+        [Title("目录", Bold = false)] 
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [ShowInInspector,DisplayAsString]
+        [PropertyOrder(6)]
+        [LabelText("目录路径"), LabelWidth(150)]
+        public string Message => ExistMenuJson ? PoofLibraryConstParam.MenuPath : "未找到配置文件";
 
-        [ShowInInspector]
-        [DisplayAsString]
-        [HideLabel]
-        public string Message => ExistMenuJson ? "目录配置加载成功" : "未找到配置文件";
-
-
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [ShowInInspector, DisplayAsString]
+        [LabelText("目录版本"), LabelWidth(150)]
+        [PropertyOrder(7)]
         [ShowIf(nameof(ExistMenuJson))]
-        [Button(ButtonSizes.Large)]
+        public string menuVersion => PoofLibraryConstParam.MenuPath;
+        
+        [BoxGroup(PoofLibraryConstParam.SETTING_GROUP)]
+        [HideIf(nameof(ExistMenuJson))]
+        [PropertyOrder(8)]
+        [Button(ButtonSizes.Large,Name = "下载目录")]
         [GUIColor(0.4f, 0.8f, 1f)]
         public void DownloadMenuJson()
         {
@@ -254,5 +224,8 @@ namespace PoofLibraryManager.Editor
                 Debug.LogWarning("配置文件已存在");
             }
         }
+        
+        private bool ExistMenuJson =>
+            File.Exists(Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.MenuPath));
     }
 }

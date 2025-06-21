@@ -3,7 +3,7 @@
     public static class PoofLibraryConstParam
     {
         public const string SETTING_ASSET_PATH = "ProjectSettings/PoofLibrarySetting.asset";
-        public const string DEFAULT_MENU_PATH = "Assets/_PoofLibrary/menu_poof_library.json";
+        public const string DEFAULT_MENU_PATH = "Assets/_EXToyLib/menu.json";
         public const string MENU_URL = "";
         public const string DEFAULT_GIT_REPO_URL = "https://github.com/No78Vino/-Poof-Library";
         public const string GIT_REPO_RAW_URL = "https://raw.githubusercontent.com/No78Vino/EX_Toy_Lib/main";
@@ -29,12 +29,18 @@
         public const string SETTING_GROUP = "PoofLibrary设置";
         
         public const string REPO_SETTING = "仓库设置";
+        public const string REPO_TOKEN_GROUP = "GitHub令牌设置";
         public const string REPO_TOKEN = "GitHub 令牌";
+        public const string REPO_TOKEN_FILE_PATH = "令牌缓存文件路径";
         public const string REPO_SETTING_GROUP_SUB_1 = "仓库设置/网络检测";
         public const string REPO_SETTING_GROUP_SUB_CONNECTION = "仓库设置/网络检测/connection";
-        
+
         public const string REPO_TOKEN_INTRO =
-            "访问令牌(可选):\n• 私有仓库必须提供\n• 避免GitHub速率限制\n• 创建地址: https://github.com/settings/tokens";
+            "访问令牌(可选):\n" +
+            "• 私有仓库必须提供令牌，令牌可以避免GitHub速率限制\n" +
+            "• 令牌创建地址: https://github.com/settings/tokens \n" +
+            "• 本项目用到的token权限只需要 `repo` 权限即可。（如果你只访问public仓库，只需要勾选public_repo）\n" +
+            "• <color=orange> 注意：请勿泄露令牌信息！ 如需要使用令牌，请将其存入一个text文件，然后选择读取该text文件路径。</color>";
 
         public const string REPO_CONNECTION_TITLE = "连接的仓库配置";
         #endregion

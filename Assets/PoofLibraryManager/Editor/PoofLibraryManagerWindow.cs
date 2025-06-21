@@ -1,20 +1,17 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
-using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
+using Object = UnityEngine.Object;
 
 namespace PoofLibraryManager.Editor
 {
     public class PoofLibraryManagerWindow : OdinMenuEditorWindow
     {
-
-        [UnityEditor.MenuItem("EX_Tools/Poof Library Manager")]
+        [MenuItem("EX_Tools/Poof Library Manager")]
         private static void OpenWindow()
         {
             var window = GetWindow<PoofLibraryManagerWindow>();
@@ -25,176 +22,80 @@ namespace PoofLibraryManager.Editor
 
         protected override OdinMenuTree BuildMenuTree()
         {
-            OdinMenuTree tree = new OdinMenuTree(supportsMultiSelect: false)
+            var tree = new OdinMenuTree(false)
             {
                 { "首页", new PoofLibraryHostPage(), EditorIcons.House },
-                { "状态", PoofLibrarySetting.Instance, EditorIcons.Info }
+                { "设置", PoofLibrarySetting.Instance, EditorIcons.SettingsCog },
+                { "库插件总览", new PoofLibOverview(), EditorIcons.UnityInfoIcon }
             };
 
             tree.DefaultMenuStyle.Height = 30;
             tree.Config.DrawSearchToolbar = true;
 
             // 尝试加载目录配置文件
-            MenuConfig config = LoadMenuConfig();
-
-            if (config != null && config.menuItems != null && config.menuItems.Count > 0)
+            var config = LoadMenuConfigs();
+            
+            if (!(config == null || config.Count == 0))
             {
-                // 添加配置查看器
-                tree.Add("配置信息", config, EditorIcons.SettingsCog);
-                
-                // 添加配置的菜单项
-                foreach (var item in config.menuItems)
+                // 如果有配置文件，添加到菜单树中
+                foreach (var item in config)
                 {
-                    // 支持层级菜单："类别/子类别/资源名称"
-                    tree.Add(item.menuPath, LoadAsset(item.assetPath));
+                    // 添加配置查看器
+                    tree.Add(item.Name, item, EditorIcons.List);
+                    
+                    foreach (var plugin in item.Plugins)
+                        tree.Add(plugin.MenuPath, plugin);
                 }
-            }
-            else
-            {
-                tree.Add("警告", "暂无目录配置，请创建配置文件", EditorIcons.UnityWarningIcon);
-                tree.Add("帮助", "在Assets/_PoofLibrary路径下创建menu.json文件", EditorIcons.Info);
             }
 
             return tree;
         }
 
-        private MenuConfig LoadMenuConfig()
+        private List<PLMenuConfig> LoadMenuConfigs()
         {
-            string fullPath = Path.Combine(Application.dataPath, "../", PoofLibraryConstParam.DEFAULT_MENU_PATH);
-
-            if (!File.Exists(fullPath))
+            var repoInfos = PoofLibrarySetting.Instance.repoInfos;
+            if (repoInfos == null || repoInfos.Count == 0)
             {
-                Debug.LogWarning($"找不到目录配置文件: {fullPath}");
+                Debug.LogWarning("没有配置任何仓库信息");
                 return null;
             }
 
-            try
+            var configs = new List<PLMenuConfig>();
+
+            foreach (var repo in repoInfos)
             {
-                string json = File.ReadAllText(fullPath);
-                return JsonUtility.FromJson<MenuConfig>(json);
+                var fullPath = Path.Combine(Application.dataPath, "../", repo.localMenuPath);
+                if (!File.Exists(fullPath))
+                {
+                    Debug.LogWarning($"找不到目录配置文件: {fullPath}");
+                    continue;
+                }
+
+                try
+                {
+                    var json = File.ReadAllText(fullPath);
+                    var config = JsonUtility.FromJson<PLMenuConfig>(json);
+                    if (config != null) configs.Add(config);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"解析配置文件失败: {e.Message}");
+                }
             }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"解析配置文件失败: {e.Message}");
-                return null;
-            }
+
+            if (configs.Count != 0) return configs;
+            Debug.LogWarning("没有有效的目录配置文件");
+            return null;
         }
 
         private Object LoadAsset(string path)
         {
             if (string.IsNullOrEmpty(path))
                 return null;
-
-            // 尝试加载资源
             var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-
-            if (asset == null)
-            {
-                Debug.LogWarning($"无法加载资源: {path}");
-                return null;
-            }
-
-            return asset;
+            if (asset != null) return asset;
+            Debug.LogWarning($"无法加载资源: {path}");
+            return null;
         }
-
-        // 菜单配置类
-        [System.Serializable]
-        public class MenuConfig
-        {
-            public List<MenuItem> menuItems = new List<MenuItem>();
-        }
-
-        [System.Serializable]
-        public class MenuItem
-        {
-            public string menuPath;
-            public string assetPath;
-            [TextArea] public string description;
-        }
-
-        // 实例引用用于下载状态更新
-    private static PoofLibraryManagerWindow instance;
-    public static PoofLibraryManagerWindow Instance => instance;
-    
-    private bool isDownloading;
-    private UnityWebRequest downloadRequest;
-    
-    protected override void OnEnable()
-    {
-        base.OnEnable();
-        instance = this;
-    }
-    
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        if (instance == this) instance = null;
-        
-        // 确保取消下载请求
-        if (isDownloading && downloadRequest != null)
-        {
-            downloadRequest.Abort();
-        }
-    }
-    
-    public void StartDownload(string url)
-    {
-        if (isDownloading) return;
-        
-        isDownloading = true;
-        EditorCoroutineUtility.StartCoroutineOwnerless(DownloadMenuConfig(url));
-    }
-    
-    private IEnumerator DownloadMenuConfig(string url)
-    {
-        // 确保目录存在
-        string directory = Path.Combine(Application.dataPath, "_PoofLibrary");
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory);
-        }
-        
-        string downloadStatus = "开始下载配置文件...";
-        float progress = 0f;
-        
-        using (downloadRequest = UnityWebRequest.Get(url))
-        {
-            // 添加下载进度回调
-            downloadRequest.SendWebRequest();
-            
-            while (!downloadRequest.isDone)
-            {
-                progress = downloadRequest.downloadProgress;
-                downloadStatus = $"下载中... {Mathf.RoundToInt(progress * 100)}%";
-                yield return null;
-            }
-            
-            // 下载完成
-            if (downloadRequest.result == UnityWebRequest.Result.Success)
-            {
-                string savePath = Path.Combine(directory, "menu.json");
-                File.WriteAllText(savePath, downloadRequest.downloadHandler.text);
-                
-                downloadStatus = "配置文件下载成功！";
-                progress = 1f;
-                
-                // 短暂显示完成状态
-                yield return new WaitForSeconds(1f);
-                
-                // 刷新资源数据库
-                AssetDatabase.Refresh();
-                
-                // 重新加载菜单
-                ForceMenuTreeRebuild();
-            }
-            else
-            {
-                downloadStatus = $"下载失败: {downloadRequest.error}";
-            }
-        }
-        
-        isDownloading = false;
-        downloadRequest = null;
-    }
     }
 }

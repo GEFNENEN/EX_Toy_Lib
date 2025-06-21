@@ -17,6 +17,16 @@ namespace PoofLibraryManager.Editor
         #region 公共接口
 
         /// <summary>
+        /// 获取Token
+        /// </summary>
+        /// <returns></returns>
+        public static string Token()
+        {
+            var setting = PoofLibrarySetting.Instance;
+            return setting.ReadToken();
+        }
+        
+        /// <summary>
         /// 下载单个文件
         /// </summary>
         /// <param name="config">下载配置</param>
@@ -36,39 +46,21 @@ namespace PoofLibraryManager.Editor
 
         #endregion
 
-        #region 下载状态事件
-
-        /// <summary>
-        /// 下载状态变更事件
-        /// </summary>
-        public static event Action<PLDownloadState> OnDownloadStateChange;
-
-        /// <summary>
-        /// 文件下载进度事件
-        /// </summary>
-        public static event Action<PLFileProgress> OnFileProgress;
-
-        /// <summary>
-        /// 文件夹下载进度事件
-        /// </summary>
-        public static event Action<PLFolderProgress> OnFolderProgress;
-
-        /// <summary>
-        /// 下载完成事件
-        /// </summary>
-        public static event Action<PLDownloadResult> OnDownloadComplete;
-
-        #endregion
-
         #region 核心实现
 
         // 当前下载状态
         private static PLDownloadState currentState = PLDownloadState.Ready;
-
-        // 文件夹下载上下文
+        
+        /// <summary>
+        /// 文件夹下载上下文
+        /// </summary>
         private static FolderDownloadContext folderContext;
-
-        // 下载单个文件
+        
+        /// <summary>
+        /// 下载单个文件的协程
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         private static IEnumerator DownloadFileCoroutine(GitFileDownloadConfig config)
         {
             // 初始化状态
@@ -78,9 +70,8 @@ namespace PoofLibraryManager.Editor
             // 创建结果对象
             var fileResult = new PLFileResult
             {
-                FileName = config.FileName,
                 RemotePath = config.RemoteFilePath,
-                LocalPath = Path.Combine(config.LocalSavePath, config.FileName)
+                LocalPath = config.LocalFilePath
             };
 
             var startTime = EditorApplication.timeSinceStartup;
@@ -88,13 +79,16 @@ namespace PoofLibraryManager.Editor
 
             // 构建下载URL
             string url = FormatGitHubUrl(config.Username, config.Repository,
-                config.Branch, config.RemoteFilePath, config.GitToken);
+                config.Branch, config.RemoteFilePath);
 
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 // 设置请求头
                 request.timeout = 45;
-                request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
+                if (!string.IsNullOrEmpty(Token()))
+                    request.SetRequestHeader("Authorization", $"token {Token()}");
+                else
+                    request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
 
                 // 开始下载
                 UnityWebRequestAsyncOperation operation = request.SendWebRequest();
@@ -113,7 +107,7 @@ namespace PoofLibraryManager.Editor
                         // 通知进度
                         NotifyFileProgress(new PLFileProgress
                         {
-                            FileName = config.FileName,
+                            FileName = config.LocalFilePath,
                             Progress = request.downloadProgress,
                             DownloadedBytes = (long)request.downloadedBytes,
                             TotalBytes = (long)(request.downloadedBytes / Math.Max(0.01f, request.downloadProgress)),
@@ -151,7 +145,7 @@ namespace PoofLibraryManager.Editor
                         NotifyDownloadComplete(new PLDownloadResult
                         {
                             IsSuccess = true,
-                            Message = $"文件下载成功: {config.FileName}",
+                            Message = $"文件下载成功: {config.LocalFilePath}",
                             TotalFiles = 1,
                             SuccessCount = 1,
                             TotalTime = totalTime,
@@ -195,8 +189,12 @@ namespace PoofLibraryManager.Editor
             currentState = PLDownloadState.Ready;
             NotifyStateChange();
         }
-
-        // 下载整个文件夹
+        
+        /// <summary>
+        ///  下载整个文件夹的协程
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
         private static IEnumerator DownloadFolderCoroutine(GitFolderDownloadConfig config)
         {
             // 初始化状态
@@ -242,7 +240,11 @@ namespace PoofLibraryManager.Editor
             NotifyStateChange();
         }
 
-        // 递归扫描文件夹
+        /// <summary>
+        ///  递归扫描远程文件夹
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static IEnumerator ScanFolderRecursive(FolderDownloadContext context)
         {
             // 构建API URL
@@ -253,12 +255,10 @@ namespace PoofLibraryManager.Editor
             {
                 // 设置请求头
                 request.timeout = 15;
-                request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
-
-                if (!string.IsNullOrWhiteSpace(context.Config.GitToken))
-                {
-                    request.SetRequestHeader("Authorization", $"token {context.Config.GitToken}");
-                }
+                if (!string.IsNullOrEmpty(Token()))
+                    request.SetRequestHeader("Authorization", $"token {Token()}");
+                else
+                    request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
 
                 // 发送请求
                 yield return request.SendWebRequest();
@@ -290,7 +290,6 @@ namespace PoofLibraryManager.Editor
                             // 添加到文件列表
                             var fileInfo = new PLFileResult
                             {
-                                FileName = item.name,
                                 RemotePath = item.path,
                                 LocalPath = Path.Combine(context.Config.LocalSavePath, item.name),
                                 FileSize = item.size
@@ -313,8 +312,12 @@ namespace PoofLibraryManager.Editor
                 // }
             }
         }
-
-        // 下载文件列表
+        
+        /// <summary>
+        ///  下载文件列表中的所有文件
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private static IEnumerator DownloadFiles(FolderDownloadContext context)
         {
             context.StartDownloadTime = EditorApplication.timeSinceStartup;
@@ -332,12 +335,12 @@ namespace PoofLibraryManager.Editor
                     TotalFiles = context.TotalFiles,
                     DownloadedFiles = context.SuccessCount + context.FailCount,
                     OverallProgress = (float)(context.SuccessCount + context.FailCount) / context.TotalFiles,
-                    CurrentFile = file.FileName
+                    CurrentFile = file.LocalPath
                 });
 
                 // 构建下载URL
                 string downloadUrl = FormatGitHubUrl(context.Config.Username, context.Config.Repository,
-                    context.Config.Branch, file.RemotePath, context.Config.GitToken);
+                    context.Config.Branch, file.RemotePath);
 
                 file.DownloadTime = EditorApplication.timeSinceStartup;
 
@@ -355,7 +358,7 @@ namespace PoofLibraryManager.Editor
                         // 更新文件进度
                         NotifyFileProgress(new PLFileProgress
                         {
-                            FileName = file.FileName,
+                            FileName = file.LocalPath,
                             Progress = request.downloadProgress,
                             DownloadedBytes = (long)request.downloadedBytes,
                             TotalBytes = file.FileSize,
@@ -417,7 +420,7 @@ namespace PoofLibraryManager.Editor
         #region 辅助方法
 
         // 格式化 GitHub URL
-        private static string FormatGitHubUrl(string user, string repo, string branch, string path, string token = "")
+        public static string FormatGitHubUrl(string user, string repo, string branch, string path)
         {
             // 替换空格为%20
             string encodedPath = path.Replace(" ", "%20");
@@ -430,12 +433,6 @@ namespace PoofLibraryManager.Editor
 
             // 构建基础URL
             string url = $"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{encodedPath}";
-
-            // 添加令牌参数（如果提供）
-            if (!string.IsNullOrWhiteSpace(token))
-            {
-                url += $"?token={token}";
-            }
 
             return url;
         }
@@ -471,27 +468,102 @@ namespace PoofLibraryManager.Editor
         // 通知状态变化
         private static void NotifyStateChange()
         {
-            OnDownloadStateChange?.Invoke(currentState);
+            switch (currentState)
+            {
+                case PLDownloadState.Ready:
+                    Debug.Log("准备就绪");
+                    break;
+                
+                case PLDownloadState.ScanningFolder:
+                    Debug.Log("扫描远程文件夹...");
+                    break;
+                
+                case PLDownloadState.DownloadingFile:
+                    Debug.Log("开始下载文件...");
+                    break;
+                
+                case PLDownloadState.Completed:
+                    Debug.Log("下载完成");
+                    EditorUtility.ClearProgressBar();
+                    break;
+                
+                case PLDownloadState.Failed:
+                    Debug.Log("下载失败");
+                    EditorUtility.ClearProgressBar();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(currentState), currentState, null);
+            }
         }
 
         // 通知文件进度
         private static void NotifyFileProgress(PLFileProgress progress)
         {
-            OnFileProgress?.Invoke(progress);
+            string title = $"下载文件: {progress.FileName}";
+            string info = $"{progress.Progress:P} - " +
+                          $"{FormatBytes(progress.DownloadedBytes)} / {FormatBytes(progress.TotalBytes)} - " +
+                          $"{FormatBytes((long)progress.Speed)}/s";
+        
+            EditorUtility.DisplayProgressBar(title, info, progress.Progress);
+            //Repaint(); // 确保窗口刷新
         }
 
         // 通知文件夹进度
         private static void NotifyFolderProgress(PLFolderProgress progress)
         {
-            OnFolderProgress?.Invoke(progress);
+            string title = $"下载文件夹: {progress.DownloadedFiles}";
+            string info = $"文件: {progress.DownloadedFiles}/{progress.TotalFiles} " +
+                          $"({progress.OverallProgress:P}) - " +
+                          $"当前: {progress.CurrentFile}";
+        
+            EditorUtility.DisplayProgressBar(title, info, progress.OverallProgress);
         }
 
         // 通知下载完成
         private static void NotifyDownloadComplete(PLDownloadResult result)
         {
-            OnDownloadComplete?.Invoke(result);
+            // 添加结果日志
+            Debug.Log($"下载完成: {result.Message}");
+            Debug.Log($"总文件: {result.TotalFiles}, 成功: {result.SuccessCount}, 失败: {result.FailCount}");
+            Debug.Log($"总耗时: {result.TotalTime:0.00}秒");
+        
+            // 显示通知
+            EditorWindow.focusedWindow.ShowNotification(result.IsSuccess
+                ? new GUIContent($"下载成功! {result.SuccessCount} 个文件已下载")
+                : new GUIContent($"下载失败! {result.FailCount} 个文件出错"));
+
+            // 记录失败文件
+            if (result.FailCount > 0)
+            {
+                Debug.Log("失败文件列表:");
+                foreach (var file in result.FileResults)
+                {
+                    if (!file.IsSuccess)
+                    {
+                        Debug.Log($"- {file.RemotePath}: {file.ErrorMessage}");
+                    }
+                }
+            }
+        
+            // 刷新资源数据库
+            AssetDatabase.Refresh();
+            EditorUtility.ClearProgressBar();
         }
 
+        public static string FormatBytes(long bytes)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB" };
+            int order = 0;
+            double len = bytes;
+        
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len /= 1024;
+            }
+        
+            return $"{len:0.##} {sizes[order]}";
+        }
         #endregion
 
         #region 内部类和数据结构

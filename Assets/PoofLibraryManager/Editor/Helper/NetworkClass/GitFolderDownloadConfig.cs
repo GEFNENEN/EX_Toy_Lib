@@ -10,7 +10,6 @@
         public string Branch;
         public string RemoteFolderPath;
         public string LocalSavePath;
-        public string GitToken = "";
         public bool IncludeSubfolders = true;
     }
 }

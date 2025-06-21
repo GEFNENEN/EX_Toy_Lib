@@ -16,16 +16,17 @@ namespace PoofLibraryManager.Editor
         [LabelText("连接成功")] Success,
         [LabelText("连接失败")] Failed
     }
-    
-    [FilePath(PoofLibraryConstParam.SETTING_ASSET_PATH)]
+
+    [PLFilePath(PoofLibraryConstParam.SETTING_ASSET_PATH)]
     public class PoofLibrarySetting : PLScriptableSingleton<PoofLibrarySetting>
     {
-        [VerticalGroup(PoofLibraryConstParam.REPO_SETTING)]
+        [BoxGroup(PoofLibraryConstParam.REPO_TOKEN_GROUP)]
         [InfoBox(PoofLibraryConstParam.REPO_TOKEN_INTRO)]
-        [ShowInInspector]
-        [LabelText(PoofLibraryConstParam.REPO_TOKEN)]
+        [LabelText(PoofLibraryConstParam.REPO_TOKEN_FILE_PATH)]
         [LabelWidth(150)]
-        public string Token = "";
+        [Sirenix.OdinInspector.FilePath(RequireExistingPath = true, Extensions = "txt",AbsolutePath = true,IncludeFileExtension = true)]
+        [InlineButton(nameof(ReadToken), SdfIconType.Upload,"加载令牌")]
+        public string TokenFilePath = "";
 
         [Title(PoofLibraryConstParam.REPO_CONNECTION_TITLE)]
         [VerticalGroup(PoofLibraryConstParam.REPO_SETTING)]
@@ -37,16 +38,22 @@ namespace PoofLibraryManager.Editor
         {
             new RepoInfo
             {
-                gitRepoUrl = PoofLibraryConstParam.DEFAULT_GIT_REPO_URL,
-                menuJsonPath = PoofLibraryConstParam.DEFAULT_MENU_PATH,
-                localMenuJsonPath = PoofLibraryConstParam.DEFAULT_MENU_PATH
+                userName = "No78Vino",
+                repoName = "EX_Toy_Lib",
+                branch = "main",
+                remoteMenuPath = PoofLibraryConstParam.DEFAULT_MENU_PATH,
+                localMenuPath = PoofLibraryConstParam.DEFAULT_MENU_PATH
             }
         };
 
         //[Title("网络状态", Bold = false)] 
         [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]
-        [GUIColor(0.8f, 1f, 0.8f)] 
-        [ShowInInspector] [HideLabel] [ReadOnly] [TextArea(1, 20)] [PropertyOrder(1)]
+        [GUIColor(0.8f, 1f, 0.8f)]
+        [ShowInInspector]
+        [HideLabel]
+        [ReadOnly]
+        [TextArea(1, 20)]
+        [PropertyOrder(1)]
         private string connectionMessage = "准备测试连接";
 
         private double connectionStartTime;
@@ -55,7 +62,36 @@ namespace PoofLibraryManager.Editor
         private bool isTestingConnection;
         private double responseTime;
 
-        
+        [BoxGroup(PoofLibraryConstParam.REPO_TOKEN_GROUP)]
+        [ShowInInspector]
+        [DisplayAsString(EnableRichText = true)]
+        [LabelText(PoofLibraryConstParam.REPO_TOKEN)]
+        [LabelWidth(150)]
+        private string showToken = "";
+
+        [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION)]
+        [PropertyOrder(3)]
+        [ShowInInspector]
+        [DisplayAsString(EnableRichText = true)]
+        [HideLabel]
+        private string connectionInfo => $"<color=orange>状态:{connectionStatus}</color>  响应时间:{responseTime:0.00}ms";
+
+        private void OnDisable()
+        {
+            Save();
+        }
+
+        private void OnDestroy()
+        {
+            Save();
+        }
+
+        private void OnValidate()
+        {
+            Save();
+        }
+
+
         [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]
         [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION, 150)]
         [PropertyOrder(2)]
@@ -69,21 +105,13 @@ namespace PoofLibraryManager.Editor
             connectionStartTime = EditorApplication.timeSinceStartup;
 
             // 生成 URL
-            debugUrl = FormatGitHubUrl(PoofLibraryConstParam.GIT_REPO_RAW_URL, PoofLibraryConstParam.DEFAULT_MENU_PATH,
-                Token);
+            debugUrl = FormatGitHubUrl(PoofLibraryConstParam.GIT_REPO_RAW_URL, PoofLibraryConstParam.DEFAULT_MENU_PATH);
 
             isTestingConnection = true;
             EditorCoroutineHelper.Start(TestConnectionCoroutine());
         }
 
-        [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION)]
-        [PropertyOrder(3)]
-        [ShowInInspector]
-        [DisplayAsString(EnableRichText = true)]
-        [HideLabel]
-        private string connectionInfo => $"<color=orange>状态:{connectionStatus}</color>  响应时间:{responseTime:0.00}ms";
 
-        
         // 测试连接协程
         private IEnumerator TestConnectionCoroutine()
         {
@@ -91,7 +119,10 @@ namespace PoofLibraryManager.Editor
             {
                 // 设置请求参数
                 request.timeout = 10;
-                request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
+                if (!string.IsNullOrEmpty(ReadToken()))
+                    request.SetRequestHeader("Authorization", $"token {ReadToken()}");
+                else
+                    request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
 
                 // 开始请求
                 var operation = request.SendWebRequest();
@@ -111,12 +142,12 @@ namespace PoofLibraryManager.Editor
                     connectionStatus = ConnectionStatus.Success;
 
                     if (request.responseCode == 200)
-                        connectionMessage = $"测试地址[{debugUrl}]\n" +
+                        connectionMessage = $"测试地址:{debugUrl}\n" +
                                             "连接成功！\n" +
                                             "HTTP 状态: 200 OK\n" +
                                             $"响应时间: {totalTime:0} ms";
                     else
-                        connectionMessage = $"测试地址[{debugUrl}]\n" +
+                        connectionMessage = $"测试地址:{debugUrl}\n" +
                                             "连接成功但文件可能不存在\n" +
                                             $"HTTP 状态: {request.responseCode}\n" +
                                             $"响应时间: {totalTime:0} ms";
@@ -136,30 +167,31 @@ namespace PoofLibraryManager.Editor
         {
             return request.responseCode switch
             {
-                401 or 403 => $"测试地址[{debugUrl}]\n" +
+                401 or 403 => $"测试地址:{debugUrl}\n" +
                               $"访问被拒绝 (HTTP {request.responseCode})\n" +
                               "• 私有仓库？请添加 GitHub 令牌",
 
-                404 => $"测试地址[{debugUrl}]\n" +
-                       "文件未找到 (HTTP 404)\n" +
-                       $"• 检查文件路径: {PoofLibraryConstParam.DEFAULT_MENU_PATH}",
+                404 => $"测试地址:{debugUrl}\n" +
+                       "文件未找到/GitHub令牌错误 (HTTP 404)\n" +
+                       $"• 检查文件路径: {PoofLibraryConstParam.DEFAULT_MENU_PATH}\n" +
+                       "• 检查GitHub令牌是否输入正确，或者令牌已过期",
 
-                429 => $"测试地址[{debugUrl}]\n" +
+                429 => $"测试地址:{debugUrl}\n" +
                        "\u26a0GitHub 速率限制\n" +
                        "• 添加 GitHub 令牌可提高限制",
 
                 _ when request.result == UnityWebRequest.Result.ConnectionError =>
-                    $"测试地址[{debugUrl}]\n" +
+                    $"测试地址:{debugUrl}\n" +
                     "网络连接失败\n" +
                     "请检查网络连接，DNS是否正常。",
                 //$"• 尝试在浏览器中打开: {sanitizedUrl}",
 
-                _ => $"测试地址[{debugUrl}]\n" + $"连接失败: {request.error} (HTTP {request.responseCode})"
+                _ => $"测试地址:{debugUrl}\n" + $"连接失败: {request.error} (HTTP {request.responseCode})"
             };
         }
 
         // 格式化 GitHub URL
-        private string FormatGitHubUrl(string repoUrl, string path, string token = "")
+        private string FormatGitHubUrl(string repoUrl, string path)
         {
             var encodedPath = path.Replace(" ", "%20");
             encodedPath = UnityWebRequest.EscapeURL(encodedPath)
@@ -169,67 +201,48 @@ namespace PoofLibraryManager.Editor
 
             var url = $"{repoUrl}/{encodedPath}";
 
-            if (!string.IsNullOrWhiteSpace(token))
-                url += $"?token={token}";
-
             return url;
         }
-    }
 
-    [Serializable]
-    public struct RepoInfo
-    {
-        [LabelText("仓库地址")] [LabelWidth(150)][PropertyOrder(1)] 
-        public string gitRepoUrl;
-
-        [HideLabel]
-        [ShowInInspector]
-        [DisplayAsString(EnableRichText = true)]
-        [PropertyOrder(1)]
-        public string rawContentGitRepoUrl =>
-            $"<color=white>下载内容地址(Raw URL):{gitRepoUrl.Replace("github.com", "raw.githubusercontent.com")}</color>";
-
-        [Space] [LabelText("远端菜单路径")] [LabelWidth(150)]
-        [PropertyOrder(2)] 
-        public string menuJsonPath;
-
-        [LabelText("本地菜单路径")] [LabelWidth(150)]
-        [PropertyOrder(3)] 
-        public string localMenuJsonPath;
-
-        [ShowIf(nameof(ExistMenuJson))]
-        [ShowInInspector]
-        [DisplayAsString(EnableRichText = true)]
-        [HideLabel]
-        [PropertyOrder(4)] 
-        private string MenuVersion
+        /// <summary>
+        ///     从存储令牌的txt文件中读取令牌
+        /// </summary>
+        /// <returns></returns>
+        public string ReadToken()
         {
-            get
+            if (string.IsNullOrEmpty(TokenFilePath))
             {
-                var version = "1.0";
-                return $"菜单目录版本: {version}";
+                Debug.LogWarning("令牌文件路径未设置");
+                EditorWindow.focusedWindow.ShowNotification(new GUIContent("令牌文件路径未设置"));
+                EditorWindow.focusedWindow.Repaint();
+                showToken = "--";
+                return string.Empty;
             }
-        }
 
-        [Button("下载菜单")]
-        [HideIf(nameof(ExistMenuJson))]
-        [PropertyOrder(5)] 
-        public void LoadMenu()
-        {
-        }
+            try
+            {
+                if (File.Exists(TokenFilePath))
+                {
+                    EditorWindow.focusedWindow.Repaint();
+                    var t = File.ReadAllText(TokenFilePath).Trim();
+                    showToken = $"<color=orange>{t}</color>";
+                    return t;
+                }
 
-        [Button("更新菜单")]
-        [ShowIf(nameof(ExistMenuJson))]
-        [PropertyOrder(5)] 
-        public void UpdateMenu()
-        {
-            LoadMenu();
-        }
-
-        private bool ExistMenuJson()
-        {
-            var isExist = File.Exists(Path.Combine(Application.dataPath, "../", localMenuJsonPath));
-            return isExist;
+                Debug.LogWarning($"令牌文件不存在: {TokenFilePath}");
+                EditorWindow.focusedWindow.ShowNotification(new GUIContent($"令牌文件不存在: {TokenFilePath}"));
+                EditorWindow.focusedWindow.Repaint();
+                showToken = "--";
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"读取令牌失败: {e.Message}");
+                EditorWindow.focusedWindow.ShowNotification(new GUIContent($"读取令牌失败: {e.Message}"));
+                EditorWindow.focusedWindow.Repaint();
+                showToken = "--";
+                return string.Empty;
+            }
         }
     }
 }

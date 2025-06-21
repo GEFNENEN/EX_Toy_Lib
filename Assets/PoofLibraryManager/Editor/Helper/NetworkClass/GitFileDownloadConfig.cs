@@ -9,8 +9,7 @@
         public string Repository;
         public string Branch;
         public string RemoteFilePath;
-        public string LocalSavePath;
-        public string FileName;
+        public string LocalFilePath;
         public string GitToken = "";
     }
 }

@@ -5,7 +5,6 @@
     /// </summary>
     public class PLFileResult
     {
-        public string FileName;
         public bool IsSuccess;
         public string ErrorMessage;
         public string RemotePath;

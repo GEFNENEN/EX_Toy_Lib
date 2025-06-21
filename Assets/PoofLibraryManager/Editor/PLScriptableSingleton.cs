@@ -67,21 +67,22 @@ namespace PoofLibraryManager.Editor
         protected static string GetFilePath()
         {
             return typeof(T).GetCustomAttributes(inherit: true)
-                .Where(v => v is FilePathAttribute)
-                .Cast<FilePathAttribute>()
+                .Where(v => v is PLFilePathAttribute)
+                .Cast<PLFilePathAttribute>()
                 .FirstOrDefault()
                 ?.filepath;
         }
     }
+    
     [AttributeUsage(AttributeTargets.Class)]
-    public class FilePathAttribute : Attribute
+    public class PLFilePathAttribute : Attribute
     {
         internal string filepath;
         /// <summary>
         /// 单例存放路径
         /// </summary>
         /// <param name="path">相对 Project 路径</param>
-        public FilePathAttribute(string path)
+        public PLFilePathAttribute(string path)
         {
             if (string.IsNullOrEmpty(path))
             {

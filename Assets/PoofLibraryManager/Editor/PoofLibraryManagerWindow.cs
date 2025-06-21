@@ -25,7 +25,6 @@ namespace PoofLibraryManager.Editor
             {
                 { "首页", new PoofLibraryHostPage(), EditorIcons.House },
                 { "设置", PoofLibrarySetting.Instance, EditorIcons.SettingsCog },
-                { "库插件总览", new PoofLibOverview(), EditorIcons.UnityInfoIcon }
             };
 
             tree.DefaultMenuStyle.Height = 30;
@@ -43,7 +42,7 @@ namespace PoofLibraryManager.Editor
                     tree.Add(item.Name, item, EditorIcons.List);
                     
                     foreach (var plugin in item.Plugins)
-                        tree.Add(plugin.MenuPath, plugin);
+                        tree.Add(plugin.MenuPath,new PluginInformationPage(plugin));
                 }
             }
 

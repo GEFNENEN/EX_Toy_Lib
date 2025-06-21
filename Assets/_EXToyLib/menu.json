@@ -3,10 +3,6 @@
   "Name": "EXToyLib",
   "Owner": "Ex-Hard",
   "Intro": "EXToyLib收录了我平时想到，看到的一些玩具级别的小插件。",
-  "Tags": [
-    "Toy",
-    "物体运动"
-  ],
   "DefaultGit_UserName": "No78Vino",
   "DefaultGit_RepoName": "EX_Toy_Lib",
   "DefaultGit_Branch": "main",
@@ -14,6 +10,10 @@
     {
       "Name": "贝塞尔子弹轨迹控制器",
       "Version": "1.0",
+      "Tags": [
+        "Toy",
+        "物体运动"
+      ],
       "MenuPath": "EXToyLib/贝塞尔子弹轨迹控制器",
       "LocalPath": "Assets/_EXToyLib/Editor/EXToyLibMenu.cs",
       "GitURL_Username": "No78Vino",

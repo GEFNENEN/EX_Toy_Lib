@@ -5,7 +5,6 @@ using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace PoofLibraryManager.Editor
 {
@@ -85,16 +84,6 @@ namespace PoofLibraryManager.Editor
 
             if (configs.Count != 0) return configs;
             Debug.LogWarning("没有有效的目录配置文件");
-            return null;
-        }
-
-        private Object LoadAsset(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return null;
-            var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-            if (asset != null) return asset;
-            Debug.LogWarning($"无法加载资源: {path}");
             return null;
         }
     }

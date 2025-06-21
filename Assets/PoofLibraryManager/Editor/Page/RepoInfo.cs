@@ -52,8 +52,21 @@ namespace PoofLibraryManager.Editor
         {
             get
             {
-                var version = "1.0";
-                return $"菜单目录版本: {version}";
+                var version = "--";
+                var fullPath = Path.Combine(Application.dataPath, "../", localMenuPath);
+                if (!File.Exists(fullPath)) Debug.LogWarning($"找不到目录配置文件: {fullPath}");
+                try
+                {
+                    var json = File.ReadAllText(fullPath);
+                    var config = JsonUtility.FromJson<PLMenuConfig>(json);
+                    version = config.Version;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"解析配置文件失败: {e.Message}");
+                }
+
+                return $"<color=white>菜单目录版本: {version}</color>";
             }
         }
 

@@ -9,8 +9,16 @@ using UnityEngine.Networking;
 
 namespace PoofLibraryManager.Editor
 {
+    public enum ConnectionStatus
+    {
+        [LabelText("待检测")] Pending,
+        [LabelText("检测中")] Checking,
+        [LabelText("连接成功")] Success,
+        [LabelText("连接失败")] Failed
+    }
+    
     [FilePath(PoofLibraryConstParam.SETTING_ASSET_PATH)]
-    public class PoofLibrarySetting : PoofLibScriptableSingleton<PoofLibrarySetting>
+    public class PoofLibrarySetting : PLScriptableSingleton<PoofLibrarySetting>
     {
         [VerticalGroup(PoofLibraryConstParam.REPO_SETTING)]
         [InfoBox(PoofLibraryConstParam.REPO_TOKEN_INTRO)]
@@ -22,6 +30,8 @@ namespace PoofLibraryManager.Editor
         [Title(PoofLibraryConstParam.REPO_CONNECTION_TITLE)]
         [VerticalGroup(PoofLibraryConstParam.REPO_SETTING)]
         [LabelText(" ")]
+        [PropertyOrder(10)]
+        [Space(15)]
         [ListDrawerSettings]
         public List<RepoInfo> repoInfos = new()
         {
@@ -33,7 +43,10 @@ namespace PoofLibraryManager.Editor
             }
         };
 
-        [Title("网络状态", Bold = false)] [ShowInInspector] [HideLabel] [ReadOnly] [TextArea(1, 20)] [PropertyOrder(1)]
+        //[Title("网络状态", Bold = false)] 
+        [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]
+        [GUIColor(0.8f, 1f, 0.8f)] 
+        [ShowInInspector] [HideLabel] [ReadOnly] [TextArea(1, 20)] [PropertyOrder(1)]
         private string connectionMessage = "准备测试连接";
 
         private double connectionStartTime;
@@ -42,8 +55,9 @@ namespace PoofLibraryManager.Editor
         private bool isTestingConnection;
         private double responseTime;
 
-        [VerticalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_1)]
-        [HorizontalGroup(PoofLibraryConstParam.SETTING_GROUP_SUB_CONNECTION, 150)]
+        
+        [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]
+        [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION, 150)]
         [PropertyOrder(2)]
         [Button("检测网络连接", ButtonSizes.Medium)]
         public void CheckConnectionToGitRepo()
@@ -62,6 +76,14 @@ namespace PoofLibraryManager.Editor
             EditorCoroutineHelper.Start(TestConnectionCoroutine());
         }
 
+        [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION)]
+        [PropertyOrder(3)]
+        [ShowInInspector]
+        [DisplayAsString(EnableRichText = true)]
+        [HideLabel]
+        private string connectionInfo => $"<color=orange>状态:{connectionStatus}</color>  响应时间:{responseTime:0.00}ms";
+
+        
         // 测试连接协程
         private IEnumerator TestConnectionCoroutine()
         {
@@ -157,18 +179,29 @@ namespace PoofLibraryManager.Editor
     [Serializable]
     public struct RepoInfo
     {
-        [LabelText("仓库地址")] [LabelWidth(150)] public string gitRepoUrl;
+        [LabelText("仓库地址")] [LabelWidth(150)][PropertyOrder(1)] 
+        public string gitRepoUrl;
+
+        [HideLabel]
+        [ShowInInspector]
+        [DisplayAsString(EnableRichText = true)]
+        [PropertyOrder(1)]
+        public string rawContentGitRepoUrl =>
+            $"<color=white>下载内容地址(Raw URL):{gitRepoUrl.Replace("github.com", "raw.githubusercontent.com")}</color>";
 
         [Space] [LabelText("远端菜单路径")] [LabelWidth(150)]
+        [PropertyOrder(2)] 
         public string menuJsonPath;
 
-        [Space] [LabelText("本地菜单路径")] [LabelWidth(150)]
+        [LabelText("本地菜单路径")] [LabelWidth(150)]
+        [PropertyOrder(3)] 
         public string localMenuJsonPath;
 
         [ShowIf(nameof(ExistMenuJson))]
         [ShowInInspector]
         [DisplayAsString(EnableRichText = true)]
         [HideLabel]
+        [PropertyOrder(4)] 
         private string MenuVersion
         {
             get
@@ -180,12 +213,14 @@ namespace PoofLibraryManager.Editor
 
         [Button("下载菜单")]
         [HideIf(nameof(ExistMenuJson))]
+        [PropertyOrder(5)] 
         public void LoadMenu()
         {
         }
 
         [Button("更新菜单")]
         [ShowIf(nameof(ExistMenuJson))]
+        [PropertyOrder(5)] 
         public void UpdateMenu()
         {
             LoadMenu();

@@ -7,7 +7,7 @@ namespace PoofLibraryManager.Editor
     using UnityEditorInternal;
     using UnityEngine;
     
-    public class PoofLibScriptableSingleton<T> : ScriptableObject where T : ScriptableObject
+    public class PLScriptableSingleton<T> : ScriptableObject where T : ScriptableObject
     {
         private static T s_Instance;
         public static T Instance
@@ -31,7 +31,7 @@ namespace PoofLibraryManager.Editor
             }
             else
             {
-                Debug.LogError($"save location of {nameof(PoofLibScriptableSingleton<T>)} is invalid");
+                Debug.LogError($"save location of {nameof(PLScriptableSingleton<T>)} is invalid");
             }
             return s_Instance;
         }

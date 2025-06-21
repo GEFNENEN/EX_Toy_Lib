@@ -27,13 +27,12 @@
                                                 + "</size></color>";
 
         public const string SETTING_GROUP = "PoofLibrary设置";
-        public const string SETTING_GROUP_SUB_1 = "PoofLibrary设置/网络检测";
-        public const string SETTING_GROUP_SUB_CONNECTION = "PoofLibrary设置/网络检测/connection";
-
         
         public const string REPO_SETTING = "仓库设置";
         public const string REPO_TOKEN = "GitHub 令牌";
-
+        public const string REPO_SETTING_GROUP_SUB_1 = "仓库设置/网络检测";
+        public const string REPO_SETTING_GROUP_SUB_CONNECTION = "仓库设置/网络检测/connection";
+        
         public const string REPO_TOKEN_INTRO =
             "访问令牌(可选):\n• 私有仓库必须提供\n• 避免GitHub速率限制\n• 创建地址: https://github.com/settings/tokens";
 

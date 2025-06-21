@@ -105,7 +105,6 @@ public class GitHubDownloader : EditorWindow
         
         if (useAlternativeMethod)
         {
-            EditorCoroutine.Start(DownloadWithWebClient(debugUrl, fullPath));
         }
         else
         {
@@ -166,62 +165,7 @@ public class GitHubDownloader : EditorWindow
         
         isDownloading = false;
     }
-
-    // 方法2: 使用.NET的WebClient（备选）
-    private IEnumerator DownloadWithWebClient(string url, string path)
-    {
-        isDownloading = true;
-        progress = 0;
-        message = "Connecting via WebClient...";
-        
-        // 在后台线程中执行以避免阻塞UI
-        Task task = Task.Run(() => 
-        {
-            try
-            {
-                using (WebClient client = new WebClient())
-                {
-                    // 添加浏览器级别的User-Agent
-                    client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-                    
-                    // 进度报告
-                    client.DownloadProgressChanged += (sender, e) => 
-                    {
-                        progress = e.ProgressPercentage / 100f;
-                        message = $"Downloading: {e.BytesReceived / 1024}KB";
-                    };
-                    
-                    // 下载数据
-                    byte[] data = client.DownloadData(url);
-                    
-                    // 保存到主线程
-                    EditorApplication.delayCall += () => 
-                    {
-                        SaveFile(path, data);
-                        isDownloading = false;
-                    };
-                }
-            }
-            catch (WebException ex)
-            {
-                message = $"WebClient failed: {ex.Message}";
-                if (ex.Response is HttpWebResponse response)
-                {
-                    message += $"\nStatus: {response.StatusCode}";
-                }
-                Debug.LogError(message);
-                isDownloading = false;
-            }
-        });
-        
-        // 等待任务完成
-        while (!task.IsCompleted)
-        {
-            Repaint();
-            yield return null;
-        }
-    }
-
+    
     private void SaveFile(string path, byte[] data)
     {
         try

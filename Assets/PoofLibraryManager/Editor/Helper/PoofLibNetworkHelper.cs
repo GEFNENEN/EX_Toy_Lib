@@ -432,7 +432,7 @@ namespace PoofLibraryManager.Editor
                 .Replace("%5C", "/");
 
             // 构建基础URL
-            string url = $"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{encodedPath}";
+            string url = $"https://raw.githubusercontent.com/{user}/{repo}/{branch}/{encodedPath}?t=<timestamp>";
 
             return url;
         }

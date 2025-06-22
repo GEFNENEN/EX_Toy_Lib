@@ -42,7 +42,7 @@ namespace PoofLibraryManager.Editor
                     tree.Add(item.Name, item, EditorIcons.List);
                     
                     foreach (var plugin in item.Plugins)
-                        tree.Add(plugin.MenuPath,new PluginInformationPage(plugin));
+                        tree.Add(plugin.MenuPath,new PluginInformationPage(plugin,item));
                 }
             }
 

@@ -298,7 +298,7 @@ namespace PoofLibraryManager.Editor
                             context.FileResults.Add(fileInfo);
                             context.TotalFiles++;
                         }
-                        else if (item.type == "dir" && context.Config.IncludeSubfolders)
+                        else if (item.type == "dir")
                         {
                             // 递归扫描子文件夹
                             context.Config.RemoteFolderPath = item.path;
@@ -564,6 +564,27 @@ namespace PoofLibraryManager.Editor
         
             return $"{len:0.##} {sizes[order]}";
         }
+        
+        public static bool ExistFolder(string localPath)
+        {
+            string fullPath = Path.Combine(Application.dataPath, "../", localPath);
+            return Directory.Exists(localPath);
+        }
+        
+        public static void DeleteFolder(string localPath)
+        {
+            var fullPath = Path.Combine(Application.dataPath, "../", localPath);
+            if (Directory.Exists(fullPath))
+            {
+                Directory.Delete(fullPath, true);
+                Debug.Log($"已删除文件夹: {fullPath}");
+            }
+            else
+            {
+                Debug.LogWarning($"文件夹不存在: {fullPath}");
+            }
+        }
+        
         #endregion
 
         #region 内部类和数据结构

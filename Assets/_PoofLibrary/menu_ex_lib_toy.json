@@ -9,6 +9,11 @@
   "Plugins": [
     {
       "Name": "贝塞尔子弹轨迹控制器",
+      "Version": "1.0",
+      "Tags": [
+        "Toy",
+        "物体运动"
+      ],
       "MenuPath": "EXToyLib/贝塞尔子弹轨迹控制器",
       "LocalPath": "Assets/_EXToyLib/Editor/EXToyLibMenu.cs",
       "GitURL_Username": "No78Vino",

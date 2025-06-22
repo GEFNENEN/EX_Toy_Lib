@@ -10,6 +10,5 @@
         public string Branch;
         public string RemoteFolderPath;
         public string LocalSavePath;
-        public bool IncludeSubfolders = true;
     }
 }

@@ -8,6 +8,8 @@
         public const string DEFAULT_GIT_REPO_URL = "https://github.com/No78Vino/-Poof-Library";
         public const string GIT_REPO_RAW_URL = "https://raw.githubusercontent.com/No78Vino/EX_Toy_Lib/main";
         
+        public const string GIT_REPO_GUIDE_FILE_NAME = "GUIDE.md";
+        
         #region text
 
         public const string POOF_LIB_MGR = "PoofLibrary管理器";

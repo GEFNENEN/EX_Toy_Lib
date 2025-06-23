@@ -19,6 +19,13 @@ namespace PoofLibraryManager.Editor
             window.Show();
         }
 
+        private static PoofLibraryManagerWindow Instance => GetWindow<PoofLibraryManagerWindow>();
+
+        public static void RefreshMenuTree()
+        {
+            if(Instance!=null) Instance.ForceMenuTreeRebuild();
+        }
+        
         protected override OdinMenuTree BuildMenuTree()
         {
             var tree = new OdinMenuTree(false)

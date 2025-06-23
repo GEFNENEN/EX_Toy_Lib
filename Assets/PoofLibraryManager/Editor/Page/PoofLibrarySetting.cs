@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Sirenix.OdinInspector;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -24,8 +25,9 @@ namespace PoofLibraryManager.Editor
         [InfoBox(PoofLibraryConstParam.REPO_TOKEN_INTRO)]
         [LabelText(PoofLibraryConstParam.REPO_TOKEN_FILE_PATH)]
         [LabelWidth(150)]
-        [Sirenix.OdinInspector.FilePath(RequireExistingPath = true, Extensions = "txt",AbsolutePath = true,IncludeFileExtension = true)]
-        [InlineButton(nameof(ReadToken), SdfIconType.Upload,"加载令牌")]
+        [Sirenix.OdinInspector.FilePath(RequireExistingPath = true, Extensions = "txt", AbsolutePath = true,
+            IncludeFileExtension = true)]
+        [InlineButton(nameof(ReadToken), SdfIconType.Upload, "加载令牌")]
         public string TokenFilePath = "";
 
         [Title(PoofLibraryConstParam.REPO_CONNECTION_TITLE)]
@@ -108,7 +110,7 @@ namespace PoofLibraryManager.Editor
             debugUrl = FormatGitHubUrl(PoofLibraryConstParam.GIT_REPO_RAW_URL, PoofLibraryConstParam.DEFAULT_MENU_PATH);
 
             isTestingConnection = true;
-            EditorCoroutineHelper.Start(TestConnectionCoroutine());
+            EditorCoroutineUtility.StartCoroutineOwnerless(TestConnectionCoroutine());
         }
 
 

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.Networking;
 using System;
 using System.Text;
+using Unity.EditorCoroutines.Editor;
 
 namespace PoofLibraryManager.Editor
 {
@@ -32,7 +33,7 @@ namespace PoofLibraryManager.Editor
         /// <param name="config">下载配置</param>
         public static void DownloadFile(GitFileDownloadConfig config)
         {
-            EditorCoroutineHelper.Start(DownloadFileCoroutine(config));
+            EditorCoroutineUtility.StartCoroutineOwnerless(DownloadFileCoroutine(config));
         }
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace PoofLibraryManager.Editor
         /// <param name="config">下载配置</param>
         public static void DownloadFolder(GitFolderDownloadConfig config)
         {
-            EditorCoroutineHelper.Start(DownloadFolderCoroutine(config));
+            EditorCoroutineUtility.StartCoroutineOwnerless(DownloadFolderCoroutine(config));
         }
 
         #endregion
@@ -207,7 +208,7 @@ namespace PoofLibraryManager.Editor
 
             // 开始扫描文件夹
             yield return ScanFolderRecursive(folderContext);
-
+            
             // 开始下载文件
             currentState = PLDownloadState.DownloadingFile;
             NotifyStateChange();
@@ -264,6 +265,11 @@ namespace PoofLibraryManager.Editor
                 yield return request.SendWebRequest();
 
                 // 处理结果
+                while (!request.isDone)
+                {
+                    yield return null; // 等待请求完成
+                }
+                
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     context.ErrorMessage = $"扫描文件夹失败: {request.error}";
@@ -271,9 +277,8 @@ namespace PoofLibraryManager.Editor
                 }
 
                 // 解析JSON响应
-                // try
-                // {
                     string json = request.downloadHandler.text;
+                    Debug.Log($"GIT JSON: {json}");
                     var items = ParseGitHubItems(json);
 
                     if (items == null || items.Length == 0)
@@ -305,11 +310,7 @@ namespace PoofLibraryManager.Editor
                             yield return ScanFolderRecursive(context);
                         }
                     }
-                //}
-                // catch (Exception ex)
-                // {
-                //     context.ErrorMessage = $"解析API响应失败: {ex.Message}";
-                // }
+                yield return null;
             }
         }
         
@@ -347,7 +348,10 @@ namespace PoofLibraryManager.Editor
                 using (UnityWebRequest request = UnityWebRequest.Get(downloadUrl))
                 {
                     request.timeout = 45;
-                    request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
+                    if (!string.IsNullOrEmpty(Token()))
+                        request.SetRequestHeader("Authorization", $"token {Token()}");
+                    else
+                        request.SetRequestHeader("User-Agent", "UnityEditor/" + Application.unityVersion);
 
                     // 发送请求
                     UnityWebRequestAsyncOperation operation = request.SendWebRequest();
@@ -548,6 +552,8 @@ namespace PoofLibraryManager.Editor
             // 刷新资源数据库
             AssetDatabase.Refresh();
             EditorUtility.ClearProgressBar();
+            
+            PoofLibraryManagerWindow.RefreshMenuTree();
         }
 
         public static string FormatBytes(long bytes)
@@ -583,6 +589,12 @@ namespace PoofLibraryManager.Editor
             {
                 Debug.LogWarning($"文件夹不存在: {fullPath}");
             }
+        }
+        
+        public static bool ExistFile(string localPath)
+        {
+            string fullPath = Path.Combine(Application.dataPath, "../", localPath);
+            return File.Exists(fullPath);
         }
         
         #endregion
@@ -628,29 +640,5 @@ namespace PoofLibraryManager.Editor
         }
 
         #endregion
-    }
-    
-    public static class EditorCoroutineHelper
-    {
-        public static void Start(IEnumerator routine)
-        {
-            EditorApplication.CallbackFunction update = null;
-            update = () =>
-            {
-                try
-                {
-                    if (!routine.MoveNext())
-                    {
-                        EditorApplication.update -= update;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                    EditorApplication.update -= update;
-                }
-            };
-            EditorApplication.update += update;
-        }
     }
 }

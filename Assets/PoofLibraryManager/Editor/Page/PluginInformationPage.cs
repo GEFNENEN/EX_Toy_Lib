@@ -98,14 +98,48 @@ namespace PoofLibraryManager.Editor
             // 重新下载插件
             PoofLibNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
             Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
-
+        }
+        
+        [HorizontalGroup("Tab/本地信息/Buttons")]
+        [Button ("打开所在文件夹", ButtonSizes.Medium,Icon = SdfIconType.Folder2Open)]
+        [ShowIf(nameof(ExistPlugin))]
+        public void OpenFolderInExplore()
+        {
+            EditorUtility.RevealInFinder(_pluginItem.LocalPath);
         }
 
+
+        [VerticalGroup("Tab/本地信息/说明书",order:99)]
+        [ShowInInspector]
+        [Title("说明书")]
+        [HideLabel]
+        [DisplayAsString(false, 16, TextAlignment.Left, true)]
+        public string GuideText
+        {
+            get
+            {
+                if (!ExistPluginGuide())
+                    return $"<color=orange>插件[{_pluginItem.Name}] 目录下，" +
+                           $"无说明书文件[{PoofLibraryConstParam.GIT_REPO_GUIDE_FILE_NAME}]</color>";
+                
+                
+                string text = System.IO.File.ReadAllText(
+                    $"{_pluginItem.LocalPath}/{PoofLibraryConstParam.GIT_REPO_GUIDE_FILE_NAME}");
+                return $"<color=white>{text}</color>";
+
+            }
+        }
+        
         private bool ExistPlugin()
         {
             return PoofLibNetworkHelper.ExistFolder(_pluginItem.LocalPath);
         }
 
+        private bool ExistPluginGuide()
+        {
+            return PoofLibNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{PoofLibraryConstParam.GIT_REPO_GUIDE_FILE_NAME}");
+        }
+        
         private string GetState()
         {
             return ExistPlugin() ? "已下载" : "未下载";

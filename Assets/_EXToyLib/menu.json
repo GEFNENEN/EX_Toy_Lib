@@ -21,6 +21,18 @@
       "GitURL_Branch": "main",
       "GitURL_Path": "Assets/_EXToyLib",
       "Intro": "贝塞尔子弹轨迹控制器是一个用于控制物体运动轨迹的小插件，支持贝塞尔曲线的绘制和编辑。"
+    },
+    {
+      "Name": "测试目录",
+      "Version": "1.0",
+      "Tags": [
+        "测试",
+        "材质"
+      ],
+      "MenuPath": "EXToyLib/测试mat",
+      "LocalPath": "Assets/_EXToy/Test",
+      "GitURL_Path": "Assets/_EXToyLib/TestMatProject",
+      "Intro": "测试简介"
     }
   ]
 }

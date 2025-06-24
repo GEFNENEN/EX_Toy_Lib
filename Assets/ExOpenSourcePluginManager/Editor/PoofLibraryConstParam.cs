@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace PoofLibraryManager.Editor
+﻿namespace PoofLibraryManager.Editor
 {
     public static class PoofLibraryConstParam
     {
@@ -11,7 +9,7 @@ namespace PoofLibraryManager.Editor
         public const string GIT_REPO_GUIDE_FILE_NAME = "GUIDE.md";
         public const string DEFAULT_PLUGINS_ROOT_FOLDER = "Assets/_ExOpenSourcePlugins";
 
-        public static RepoInfo[] OfficialRepoInfos = new[]
+        public static readonly RepoInfo[] OfficialRepoInfos = new[]
         {
             new RepoInfo
             {
@@ -43,7 +41,8 @@ namespace PoofLibraryManager.Editor
                                                 + "</size></color>";
         
         public const string POOF_LIB_HOST_INTRO = "<color=white><size=20>" 
-                                                + "使用说明："
+                                                + "使用说明：\n" 
+                                                + "EX开源插件管理器。可以搜罗 "
                                                 + "</size></color>";
         
         public const string REPO_SETTING = "仓库设置";

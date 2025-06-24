@@ -36,17 +36,7 @@ namespace PoofLibraryManager.Editor
         [PropertyOrder(10)]
         [Space(15)]
         [ListDrawerSettings]
-        public List<RepoInfo> repoInfos = new()
-        {
-            new RepoInfo
-            {
-                userName = "No78Vino",
-                repoName = "EX_Toy_Lib",
-                branch = "main",
-                remoteMenuPath = PoofLibraryConstParam.DEFAULT_MENU_PATH,
-                localMenuPath = PoofLibraryConstParam.DEFAULT_MENU_PATH
-            }
-        };
+        public RepoInfo[] repoInfos = PoofLibraryConstParam.OfficialRepoInfos;
 
         //[Title("网络状态", Bold = false)] 
         [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]

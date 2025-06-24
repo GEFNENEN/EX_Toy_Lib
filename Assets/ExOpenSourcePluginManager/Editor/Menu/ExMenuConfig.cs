@@ -2,10 +2,10 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     [System.Serializable]
-    public class PLMenuConfig
+    public class ExMenuConfig
     {
         [BoxGroup("插件库基本信息")]
         [LabelText("插件库名")]
@@ -45,6 +45,6 @@ namespace PoofLibraryManager.Editor
         [Title("插件列表")]
         [LabelText("-")]
         [ListDrawerSettings(IsReadOnly = true)]
-        public List<PLPluginItem> Plugins = new List<PLPluginItem>();
+        public List<ExPluginItem> Plugins = new List<ExPluginItem>();
     }
 }

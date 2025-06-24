@@ -2,20 +2,20 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     public class PluginInformationPage
     {
-        private PLMenuConfig _menuConfig;
-        private PLPluginItem _pluginItem;
+        private ExMenuConfig _menuConfig;
+        private ExPluginItem _pluginItem;
 
         [TabGroup("Tab", "基础信息", order: 2)]
         [PropertyOrder(10)]
         [ShowInInspector]
         [HideLabel]
-        public PLPluginItem PluginItem => _pluginItem;
+        public ExPluginItem PluginItem => _pluginItem;
 
-        public PluginInformationPage(PLPluginItem pluginItem,PLMenuConfig menuConfig)
+        public PluginInformationPage(ExPluginItem pluginItem,ExMenuConfig menuConfig)
         {
             _pluginItem = pluginItem;
             _menuConfig = menuConfig;
@@ -52,7 +52,7 @@ namespace PoofLibraryManager.Editor
                 "确认", "取消");
             if (!result) return;
 
-            PoofLibNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
+            ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
             Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
         }
 
@@ -72,7 +72,7 @@ namespace PoofLibraryManager.Editor
                 "卸载将删除本地插件文件夹。",
                 "确认", "取消");
             if (!result) return;
-            PoofLibNetworkHelper.DeleteFolder(_pluginItem.LocalPath);
+            ExOpenSourceNetworkHelper.DeleteFolder(_pluginItem.LocalPath);
             Debug.Log($"插件 {_pluginItem.Name} 已卸载");
         }
 
@@ -91,12 +91,12 @@ namespace PoofLibraryManager.Editor
             // 卸载当前插件
             if (ExistPlugin())
             {
-                PoofLibNetworkHelper.DeleteFolder(_pluginItem.LocalPath);
+                ExOpenSourceNetworkHelper.DeleteFolder(_pluginItem.LocalPath);
                 Debug.Log($"插件 {_pluginItem.Name} 已卸载");
             }
 
             // 重新下载插件
-            PoofLibNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
+            ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
             Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
         }
         
@@ -120,11 +120,11 @@ namespace PoofLibraryManager.Editor
             {
                 if (!ExistPluginGuide())
                     return $"<color=orange>插件[{_pluginItem.Name}] 目录下，" +
-                           $"无说明书文件[{PoofLibraryConstParam.GIT_REPO_GUIDE_FILE_NAME}]</color>";
+                           $"无说明书文件[{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}]</color>";
                 
                 
                 string text = System.IO.File.ReadAllText(
-                    $"{_pluginItem.LocalPath}/{PoofLibraryConstParam.GIT_REPO_GUIDE_FILE_NAME}");
+                    $"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
                 return $"<color=white>{text}</color>";
 
             }
@@ -132,12 +132,12 @@ namespace PoofLibraryManager.Editor
         
         private bool ExistPlugin()
         {
-            return PoofLibNetworkHelper.ExistFolder(_pluginItem.LocalPath);
+            return ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);
         }
 
         private bool ExistPluginGuide()
         {
-            return PoofLibNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{PoofLibraryConstParam.GIT_REPO_GUIDE_FILE_NAME}");
+            return ExOpenSourceNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
         }
         
         private string GetState()

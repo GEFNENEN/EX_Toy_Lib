@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     /// <summary>
     /// 下载结果

@@ -1,6 +1,6 @@
-﻿namespace PoofLibraryManager.Editor
+﻿namespace ExOpenSource.Editor
 {
-    public static class PoofLibraryConstParam
+    public static class ExOpenSourceConstParam
     {
         public const string SETTING_ASSET_PATH = "ProjectSettings/PoofLibrarySetting.asset";
         public const string DEFAULT_MENU_PATH = "Assets/_EXToyLib/menu.json";

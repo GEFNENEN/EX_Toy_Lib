@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     public enum ConnectionStatus
     {
@@ -18,28 +18,28 @@ namespace PoofLibraryManager.Editor
         [LabelText("连接失败")] Failed
     }
 
-    [PLFilePath(PoofLibraryConstParam.SETTING_ASSET_PATH)]
-    public class PoofLibrarySetting : PLScriptableSingleton<PoofLibrarySetting>
+    [PLFilePath(ExOpenSourceConstParam.SETTING_ASSET_PATH)]
+    public class ExOpenSourcePluginManagerSetting : ExScriptableSingleton<ExOpenSourcePluginManagerSetting>
     {
-        [BoxGroup(PoofLibraryConstParam.REPO_TOKEN_GROUP)]
-        [InfoBox(PoofLibraryConstParam.REPO_TOKEN_INTRO)]
-        [LabelText(PoofLibraryConstParam.REPO_TOKEN_FILE_PATH)]
+        [BoxGroup(ExOpenSourceConstParam.REPO_TOKEN_GROUP)]
+        [InfoBox(ExOpenSourceConstParam.REPO_TOKEN_INTRO)]
+        [LabelText(ExOpenSourceConstParam.REPO_TOKEN_FILE_PATH)]
         [LabelWidth(150)]
         [Sirenix.OdinInspector.FilePath(RequireExistingPath = true, Extensions = "txt", AbsolutePath = true,
             IncludeFileExtension = true)]
         [InlineButton(nameof(ReadToken), SdfIconType.Upload, "加载令牌")]
         public string TokenFilePath = "";
 
-        [Title(PoofLibraryConstParam.REPO_CONNECTION_TITLE)]
-        [VerticalGroup(PoofLibraryConstParam.REPO_SETTING)]
+        [Title(ExOpenSourceConstParam.REPO_CONNECTION_TITLE)]
+        [VerticalGroup(ExOpenSourceConstParam.REPO_SETTING)]
         [LabelText(" ")]
         [PropertyOrder(10)]
         [Space(15)]
         [ListDrawerSettings]
-        public RepoInfo[] repoInfos = PoofLibraryConstParam.OfficialRepoInfos;
+        public RepoInfo[] repoInfos = ExOpenSourceConstParam.OfficialRepoInfos;
 
         //[Title("网络状态", Bold = false)] 
-        [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]
+        [BoxGroup(ExOpenSourceConstParam.REPO_SETTING_GROUP_SUB_1)]
         [GUIColor(0.8f, 1f, 0.8f)]
         [ShowInInspector]
         [HideLabel]
@@ -54,14 +54,14 @@ namespace PoofLibraryManager.Editor
         private bool isTestingConnection;
         private double responseTime;
 
-        [BoxGroup(PoofLibraryConstParam.REPO_TOKEN_GROUP)]
+        [BoxGroup(ExOpenSourceConstParam.REPO_TOKEN_GROUP)]
         [ShowInInspector]
         [DisplayAsString(EnableRichText = true)]
-        [LabelText(PoofLibraryConstParam.REPO_TOKEN)]
+        [LabelText(ExOpenSourceConstParam.REPO_TOKEN)]
         [LabelWidth(150)]
         private string showToken = "";
 
-        [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION)]
+        [HorizontalGroup(ExOpenSourceConstParam.REPO_SETTING_GROUP_SUB_CONNECTION)]
         [PropertyOrder(3)]
         [ShowInInspector]
         [DisplayAsString(EnableRichText = true)]
@@ -84,8 +84,8 @@ namespace PoofLibraryManager.Editor
         }
 
 
-        [BoxGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_1)]
-        [HorizontalGroup(PoofLibraryConstParam.REPO_SETTING_GROUP_SUB_CONNECTION, 150)]
+        [BoxGroup(ExOpenSourceConstParam.REPO_SETTING_GROUP_SUB_1)]
+        [HorizontalGroup(ExOpenSourceConstParam.REPO_SETTING_GROUP_SUB_CONNECTION, 150)]
         [PropertyOrder(2)]
         [Button("检测网络连接", ButtonSizes.Medium)]
         public void CheckConnectionToGitRepo()
@@ -97,7 +97,7 @@ namespace PoofLibraryManager.Editor
             connectionStartTime = EditorApplication.timeSinceStartup;
 
             // 生成 URL
-            debugUrl = FormatGitHubUrl(PoofLibraryConstParam.GIT_REPO_RAW_URL, PoofLibraryConstParam.DEFAULT_MENU_PATH);
+            debugUrl = FormatGitHubUrl(ExOpenSourceConstParam.GIT_REPO_RAW_URL, ExOpenSourceConstParam.DEFAULT_MENU_PATH);
 
             isTestingConnection = true;
             EditorCoroutineUtility.StartCoroutineOwnerless(TestConnectionCoroutine());
@@ -165,7 +165,7 @@ namespace PoofLibraryManager.Editor
 
                 404 => $"测试地址:{debugUrl}\n" +
                        "文件未找到/GitHub令牌错误 (HTTP 404)\n" +
-                       $"• 检查文件路径: {PoofLibraryConstParam.DEFAULT_MENU_PATH}\n" +
+                       $"• 检查文件路径: {ExOpenSourceConstParam.DEFAULT_MENU_PATH}\n" +
                        "• 检查GitHub令牌是否输入正确，或者令牌已过期",
 
                 429 => $"测试地址:{debugUrl}\n" +

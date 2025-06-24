@@ -8,12 +8,12 @@ using System;
 using System.Text;
 using Unity.EditorCoroutines.Editor;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     /// <summary>
     /// Git 下载工具类 - 提供文件和文件夹下载功能
     /// </summary>
-    public static class PoofLibNetworkHelper
+    public static class ExOpenSourceNetworkHelper
     {
         #region 公共接口
 
@@ -23,7 +23,7 @@ namespace PoofLibraryManager.Editor
         /// <returns></returns>
         public static string Token()
         {
-            var setting = PoofLibrarySetting.Instance;
+            var setting = ExOpenSourcePluginManagerSetting.Instance;
             return setting.ReadToken();
         }
         
@@ -553,7 +553,7 @@ namespace PoofLibraryManager.Editor
             AssetDatabase.Refresh();
             EditorUtility.ClearProgressBar();
             
-            PoofLibraryManagerWindow.RefreshMenuTree();
+            ExOpenSourcePluginManagerWindow.RefreshMenuTree();
         }
 
         public static string FormatBytes(long bytes)

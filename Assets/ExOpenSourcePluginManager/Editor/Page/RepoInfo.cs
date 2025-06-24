@@ -4,7 +4,7 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     [Serializable]
     public struct RepoInfo
@@ -38,7 +38,7 @@ namespace PoofLibraryManager.Editor
         {
             get
             {
-                var gitRepoUrl = PoofLibNetworkHelper.FormatGitHubUrl(userName, repoName, branch, remoteMenuPath);
+                var gitRepoUrl = ExOpenSourceNetworkHelper.FormatGitHubUrl(userName, repoName, branch, remoteMenuPath);
                 return $"<color=white>下载内容地址(Raw URL):{gitRepoUrl}</color>";
             }
         }
@@ -58,7 +58,7 @@ namespace PoofLibraryManager.Editor
                 try
                 {
                     var json = File.ReadAllText(fullPath);
-                    var config = JsonUtility.FromJson<PLMenuConfig>(json);
+                    var config = JsonUtility.FromJson<ExMenuConfig>(json);
                     version = config.Version;
                 }
                 catch (Exception e)
@@ -72,7 +72,7 @@ namespace PoofLibraryManager.Editor
 
         public void LoadMenu()
         {
-            PoofLibNetworkHelper.DownloadFile(GetGitFileDownloadConfig());
+            ExOpenSourceNetworkHelper.DownloadFile(GetGitFileDownloadConfig());
         }
 
         public void UpdateMenu()
@@ -107,7 +107,7 @@ namespace PoofLibraryManager.Editor
                 Branch = branch,
                 RemoteFilePath = remoteMenuPath,
                 LocalFilePath = localMenuPath,
-                GitToken = PoofLibrarySetting.Instance.ReadToken()
+                GitToken = ExOpenSourcePluginManagerSetting.Instance.ReadToken()
             };
         }
         

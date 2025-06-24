@@ -1,10 +1,10 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
     [System.Serializable]
-    public class PLPluginItem
+    public class ExPluginItem
     {
         [BoxGroup("插件基本信息")]
         [LabelText("插件名")]

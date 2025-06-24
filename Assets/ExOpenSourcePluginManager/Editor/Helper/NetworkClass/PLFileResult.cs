@@ -1,4 +1,4 @@
-﻿namespace PoofLibraryManager.Editor
+﻿namespace ExOpenSource.Editor
 {
     /// <summary>
     /// 文件下载结果

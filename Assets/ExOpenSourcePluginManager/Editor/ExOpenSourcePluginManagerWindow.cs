@@ -6,20 +6,20 @@ using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
 
-namespace PoofLibraryManager.Editor
+namespace ExOpenSource.Editor
 {
-    public class PoofLibraryManagerWindow : OdinMenuEditorWindow
+    public class ExOpenSourcePluginManagerWindow : OdinMenuEditorWindow
     {
         [MenuItem("EX_Tools/Poof Library Manager")]
         private static void OpenWindow()
         {
-            var window = GetWindow<PoofLibraryManagerWindow>();
-            window.titleContent = new GUIContent(PoofLibraryConstParam.POOF_LIB_MGR);
+            var window = GetWindow<ExOpenSourcePluginManagerWindow>();
+            window.titleContent = new GUIContent(ExOpenSourceConstParam.POOF_LIB_MGR);
             window.minSize = new Vector2(800, 600);
             window.Show();
         }
 
-        private static PoofLibraryManagerWindow Instance => GetWindow<PoofLibraryManagerWindow>();
+        private static ExOpenSourcePluginManagerWindow Instance => GetWindow<ExOpenSourcePluginManagerWindow>();
 
         public static void RefreshMenuTree()
         {
@@ -30,8 +30,8 @@ namespace PoofLibraryManager.Editor
         {
             var tree = new OdinMenuTree(false)
             {
-                { "首页", new PoofLibraryHostPage(), EditorIcons.House },
-                { "设置", PoofLibrarySetting.Instance, EditorIcons.SettingsCog },
+                { "首页", new ExOpenSourceHostPage(), EditorIcons.House },
+                { "设置", ExOpenSourcePluginManagerSetting.Instance, EditorIcons.SettingsCog },
             };
 
             tree.DefaultMenuStyle.Height = 30;
@@ -56,16 +56,16 @@ namespace PoofLibraryManager.Editor
             return tree;
         }
 
-        private List<PLMenuConfig> LoadMenuConfigs()
+        private List<ExMenuConfig> LoadMenuConfigs()
         {
-            var repoInfos = PoofLibrarySetting.Instance.repoInfos;
+            var repoInfos = ExOpenSourcePluginManagerSetting.Instance.repoInfos;
             if (repoInfos == null || repoInfos.Length == 0)
             {
                 Debug.LogWarning("没有配置任何仓库信息");
                 return null;
             }
 
-            var configs = new List<PLMenuConfig>();
+            var configs = new List<ExMenuConfig>();
 
             foreach (var repo in repoInfos)
             {
@@ -79,7 +79,7 @@ namespace PoofLibraryManager.Editor
                 try
                 {
                     var json = File.ReadAllText(fullPath);
-                    var config = JsonUtility.FromJson<PLMenuConfig>(json);
+                    var config = JsonUtility.FromJson<ExMenuConfig>(json);
                     if (config != null) configs.Add(config);
                 }
                 catch (Exception e)

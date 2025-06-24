@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Sirenix.OdinInspector;
-using UnityEditor;
+﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace PoofLibraryManager.Editor
@@ -10,7 +8,7 @@ namespace PoofLibraryManager.Editor
         // 窗口首页内容
         [BoxGroup(PoofLibraryConstParam.POOF_LIB_HOST_TITLE)] 
         [ShowInInspector]
-        [HideLabel,DisplayAsString(false,14,TextAlignment.Left,true)]
+        [HideLabel,DisplayAsString(false,10,TextAlignment.Left,true)]
         public string Introduction => PoofLibraryConstParam.POOF_LIB_HOST_INTRO;
     }
 }

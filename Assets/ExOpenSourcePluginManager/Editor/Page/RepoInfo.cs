@@ -110,5 +110,13 @@ namespace PoofLibraryManager.Editor
                 GitToken = PoofLibrarySetting.Instance.ReadToken()
             };
         }
+        
+        public static bool Equal(RepoInfo a,RepoInfo b)
+        {
+            return a.repoName == b.repoName
+                   && a.userName == b.userName
+                   && a.branch == b.branch
+                   && a.remoteMenuPath == b.remoteMenuPath;
+        }
     }
 }

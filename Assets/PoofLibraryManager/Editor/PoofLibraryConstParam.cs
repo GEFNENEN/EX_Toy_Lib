@@ -1,22 +1,40 @@
-﻿namespace PoofLibraryManager.Editor
+﻿using System.Collections.Generic;
+
+namespace PoofLibraryManager.Editor
 {
     public static class PoofLibraryConstParam
     {
         public const string SETTING_ASSET_PATH = "ProjectSettings/PoofLibrarySetting.asset";
         public const string DEFAULT_MENU_PATH = "Assets/_EXToyLib/menu.json";
-        public const string MENU_URL = "";
-        public const string DEFAULT_GIT_REPO_URL = "https://github.com/No78Vino/-Poof-Library";
         public const string GIT_REPO_RAW_URL = "https://raw.githubusercontent.com/No78Vino/EX_Toy_Lib/main";
         
         public const string GIT_REPO_GUIDE_FILE_NAME = "GUIDE.md";
+        public const string DEFAULT_PLUGINS_ROOT_FOLDER = "Assets/_ExOpenSourcePlugins";
+
+        public static RepoInfo[] OfficialRepoInfos = new[]
+        {
+            new RepoInfo
+            {
+                userName = "No78Vino",
+                repoName = "EX_Toy_Lib",
+                branch = "main",
+                remoteMenuPath = "Assets/_EXToyLib/menu.json",
+                localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/EXToyLib/menu_ex_toy_lib.json"
+            },
+            new RepoInfo
+            {
+                userName = "No78Vino",
+                repoName = "EX_Toy_Lib",
+                branch = "main",
+                remoteMenuPath = "Assets/PoofLib/menu.json",
+                localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/PoofLib/menu_poof_lib.json"
+            }
+        };
         
         #region text
 
-        public const string POOF_LIB_MGR = "PoofLibrary管理器";
-
-        public const string POOF_LIB_HOST_TITLE = "欢迎使用PoofLibrary";
-        public const string POOF_LIB_HOST_TITLE_SUB = "欢迎使用PoofLibrary/SUB";
-
+        public const string POOF_LIB_MGR = "EX开源插件管理器";
+        public const string POOF_LIB_HOST_TITLE = "欢迎使用EX开源插件管理器";
         public const string POOF_LIB_HOST_MSG = "<color=white><size=16>" 
                                                 + "此工具用于管理项目资源目录\n"
                                                 + "1. 创建Assets/_PoofLibrary/menu.json文件\n"
@@ -27,8 +45,6 @@
         public const string POOF_LIB_HOST_INTRO = "<color=white><size=20>" 
                                                 + "使用说明："
                                                 + "</size></color>";
-
-        public const string SETTING_GROUP = "PoofLibrary设置";
         
         public const string REPO_SETTING = "仓库设置";
         public const string REPO_TOKEN_GROUP = "GitHub令牌设置";

@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using System.IO;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
@@ -109,27 +110,44 @@ namespace ExOpenSource.Editor
         }
 
 
-        [VerticalGroup("Tab/本地信息/说明书",order:99)]
+        [TitleGroup("Tab/本地信息/说明书",order:99,HideWhenChildrenAreInvisible = true)]
         [ShowInInspector]
-        [Title("说明书")]
+        [ShowIf("@ExistPlugin() && !ExistPluginGuide()")]
         [HideLabel]
         [DisplayAsString(false, 16, TextAlignment.Left, true)]
-        public string GuideText
+        public string GuideText =>
+            $"<color=orange>插件[{_pluginItem.Name}] 目录下，" +
+            $"无说明书文件[{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}]</color>";
+
+        [TitleGroup("Tab/本地信息/说明书")]
+        [ShowInInspector]
+        [ShowIf("@ExistPlugin() && ExistPluginGuide()")]
+        [PropertyOrder(10)]
+        [Button("打开说明书", ButtonSizes.Medium, Icon = SdfIconType.Book)]
+        public void OpenGuideMdInExplore()
+        {
+            var guideFilePath = $"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}";
+            EditorUtility.OpenWithDefaultApp(guideFilePath);
+        }
+        
+        [TitleGroup("Tab/本地信息/说明书")]
+        [ShowInInspector]
+        [ShowIf("@ExistPlugin() && ExistPluginGuide()")]
+        [PropertyOrder(11)]
+        [HideLabel]
+        [DisplayAsString(false, 12, TextAlignment.Left, true)]
+        public string GuidePreview
         {
             get
             {
-                if (!ExistPluginGuide())
-                    return $"<color=orange>插件[{_pluginItem.Name}] 目录下，" +
-                           $"无说明书文件[{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}]</color>";
-                
-                
-                string text = System.IO.File.ReadAllText(
+                if (!ExistPluginGuide()) return "";
+                string fileContent = File.ReadAllText(
                     $"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
-                return $"<color=white>{text}</color>";
-
+                return $"<color=white>插件[{_pluginItem.Name}] 说明书预览：</color>\n" +
+                       fileContent;
             }
         }
-        
+
         private bool ExistPlugin()
         {
             return ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);

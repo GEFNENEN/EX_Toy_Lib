@@ -2,7 +2,7 @@
 {
     public static class ExOpenSourceConstParam
     {
-        public const string SETTING_ASSET_PATH = "ProjectSettings/PoofLibrarySetting.asset";
+        public const string SETTING_ASSET_PATH = "ProjectSettings/ExOpenSourceSetting.asset";
         public const string DEFAULT_MENU_PATH = "Assets/_EXToyLib/menu.json";
         public const string GIT_REPO_RAW_URL = "https://raw.githubusercontent.com/No78Vino/EX_Toy_Lib/main";
         
@@ -19,14 +19,14 @@
                 remoteMenuPath = "Assets/_EXToyLib/menu.json",
                 localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/EXToyLib/menu_ex_toy_lib.json"
             },
-            new RepoInfo
-            {
-                userName = "No78Vino",
-                repoName = "EX_Toy_Lib",
-                branch = "main",
-                remoteMenuPath = "Assets/PoofLib/menu.json",
-                localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/PoofLib/menu_poof_lib.json"
-            }
+            // new RepoInfo
+            // {
+            //     userName = "No78Vino",
+            //     repoName = "-Poof-Library",
+            //     branch = "main",
+            //     remoteMenuPath = "Assets/PoofLib/menu.json",
+            //     localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/PoofLib/menu_poof_lib.json"
+            // }
         };
         
         #region text

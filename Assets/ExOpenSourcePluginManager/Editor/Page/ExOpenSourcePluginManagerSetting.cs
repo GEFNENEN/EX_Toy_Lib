@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities.Editor;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -35,8 +36,8 @@ namespace ExOpenSource.Editor
         [LabelText(" ")]
         [PropertyOrder(10)]
         [Space(15)]
-        [ListDrawerSettings]
-        public RepoInfo[] repoInfos = ExOpenSourceConstParam.OfficialRepoInfos;
+        [ListDrawerSettings(OnTitleBarGUI = nameof(DrawAddDefaultMenuButton))]
+        public List<RepoInfo> repoInfos = new List<RepoInfo>(ExOpenSourceConstParam.OfficialRepoInfos);
 
         //[Title("网络状态", Bold = false)] 
         [BoxGroup(ExOpenSourceConstParam.REPO_SETTING_GROUP_SUB_1)]
@@ -205,7 +206,6 @@ namespace ExOpenSource.Editor
             if (string.IsNullOrEmpty(TokenFilePath))
             {
                 Debug.LogWarning("令牌文件路径未设置");
-                EditorWindow.focusedWindow.ShowNotification(new GUIContent("令牌文件路径未设置"));
                 EditorWindow.focusedWindow.Repaint();
                 showToken = "--";
                 return string.Empty;
@@ -234,6 +234,25 @@ namespace ExOpenSource.Editor
                 EditorWindow.focusedWindow.Repaint();
                 showToken = "--";
                 return string.Empty;
+            }
+        }
+        
+        private void DrawAddDefaultMenuButton()
+        {
+            if (SirenixEditorGUI.ToolbarButton(new GUIContent("添加默认库")))
+            {
+                // 添加默认菜单配置
+                foreach (var repo in ExOpenSourceConstParam.OfficialRepoInfos)
+                {
+                    if (repoInfos.Exists(r => r.userName == repo.userName && r.repoName == repo.repoName))
+                    {
+                        Debug.LogWarning($"已存在仓库: {repo.userName}/{repo.repoName}");
+                        continue;
+                    }
+
+                    repoInfos.Add(repo);
+                    Debug.Log($"添加默认仓库: {repo.userName}/{repo.repoName}");
+                }
             }
         }
     }

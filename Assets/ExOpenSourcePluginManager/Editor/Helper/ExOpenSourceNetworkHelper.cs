@@ -579,15 +579,16 @@ namespace ExOpenSource.Editor
         
         public static void DeleteFolder(string localPath)
         {
-            var fullPath = Path.Combine(Application.dataPath, "../", localPath);
-            if (Directory.Exists(fullPath))
+            if (AssetDatabase.IsValidFolder(localPath))
             {
-                Directory.Delete(fullPath, true);
-                Debug.Log($"已删除文件夹: {fullPath}");
+                // 执行删除操作
+                AssetDatabase.DeleteAsset(localPath);
+                AssetDatabase.Refresh();
+                Debug.Log($"成功删除文件夹: {localPath}");
             }
             else
             {
-                Debug.LogWarning($"文件夹不存在: {fullPath}");
+                Debug.LogWarning($"文件夹不存在或路径无效: {localPath}");
             }
         }
         

@@ -63,7 +63,7 @@ namespace ExOpenSource.Editor
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"解析配置文件失败: {e.Message}");
+                    Debug.LogWarning($"解析配置文件失败: {e.Message}");
                 }
 
                 return $"<color=white>菜单目录版本: {version}</color>";

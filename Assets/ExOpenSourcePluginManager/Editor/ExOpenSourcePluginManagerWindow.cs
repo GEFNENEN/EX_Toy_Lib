@@ -59,7 +59,7 @@ namespace ExOpenSource.Editor
         private List<ExMenuConfig> LoadMenuConfigs()
         {
             var repoInfos = ExOpenSourcePluginManagerSetting.Instance.repoInfos;
-            if (repoInfos == null || repoInfos.Length == 0)
+            if (repoInfos == null || repoInfos.Count == 0)
             {
                 Debug.LogWarning("没有配置任何仓库信息");
                 return null;

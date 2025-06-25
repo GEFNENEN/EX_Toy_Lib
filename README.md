@@ -13,5 +13,11 @@
 1. 导入Odin Inspector插件(付费),Odin Inspector来源请自行解决。建议使用3.2+版本。
 2. 导入本插件，以下两种方式：
 - 使用Unity Package Manager安装
-  在Unity Package Manager中添加git地址:https://github.com/No78Vino/EX_Toy_Lib.git?path=Assets/ExOpenSourcePluginManager
-- 使用git clone本仓库，或者直接下载压缩包，然后将[Assets/ExOpenSourcePluginManager]文件夹拷贝到你的项目中即可
+  - 在Unity Package Manager中添加git地址:https://github.com/No78Vino/EX_Toy_Lib.git?path=Assets/ExOpenSourcePluginManager
+- 使用git clone本仓库，或者直接下载压缩包.
+  - 下载完项目后，将[Assets/ExOpenSourcePluginManager]文件夹拷贝到你的项目中
+  - 然后再去Unity Package Manager中安装本插件依赖的Editor Coroutines工具库。
+
+### 打开
+
+### 配置

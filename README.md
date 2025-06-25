@@ -90,4 +90,9 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
   - 来介绍一下Plugin的信息规范
   - Name：插件名
   - Version：插件版本号
-  - Tags：插件描述用标签。
+  - Intro：插件介绍
+  - Tags：插件描述用标签。这个是预留给过滤功能用的参数。现在还没做。
+  - MenuPath：菜单目录树路径。
+    - s 
+  - GitURL_Path：远端git仓库里插件文件夹的路径
+  - LocalPath：本地工程安装插件的路径

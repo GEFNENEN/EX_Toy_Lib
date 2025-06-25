@@ -24,10 +24,19 @@ namespace ExOpenSource.Editor
 
         [TabGroup("Tab", "本地信息")]
         [PropertyOrder(0)]
-        [DisplayAsString(EnableRichText = true)]
+        [DisplayAsString(Overflow = false,EnableRichText = true)]
         [ShowInInspector]
         [HideLabel]
-        private string LocalPath => $"<color=white>本地路径:{_pluginItem.LocalPath}</color>";
+        private string LocalPath
+        {
+            get
+            {
+                if (_pluginItem.IsUpmPackage())
+                    return $"<color=white>UPM包名 : {_pluginItem.UPM_Package.name}\n" +
+                           $"UPM包Git Url : {_pluginItem.UPM_Package.url}</color>";
+                return $"<color=white>本地路径:{_pluginItem.LocalPath}</color>";
+            }
+        }
 
         [TabGroup("Tab", "本地信息")]
         [PropertyOrder(0)]
@@ -53,8 +62,17 @@ namespace ExOpenSource.Editor
                 "确认", "取消");
             if (!result) return;
 
-            ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
-            Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
+            if (_pluginItem.IsUpmPackage())
+            {
+                UpmGitInstaller.AddGitPackage(
+                    _pluginItem.UPM_Package.name,
+                    _pluginItem.UPM_Package.url);
+            }
+            else
+            {
+                ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
+                Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
+            }
         }
 
         [HorizontalGroup("Tab/本地信息/Buttons")]
@@ -150,12 +168,14 @@ namespace ExOpenSource.Editor
 
         private bool ExistPlugin()
         {
-            return ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);
+            return _pluginItem.IsUpmPackage() 
+                ? UpmGitInstaller.IsInstalled(_pluginItem.UPM_Package.name) 
+                : ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);
         }
 
         private bool ExistPluginGuide()
         {
-            return ExOpenSourceNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
+            return !_pluginItem.IsUpmPackage() && ExOpenSourceNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
         }
         
         private string GetState()

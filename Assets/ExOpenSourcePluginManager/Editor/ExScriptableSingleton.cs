@@ -38,11 +38,7 @@ namespace ExOpenSource.Editor
 
         public static void Save(bool saveAsText = true)
         {
-            if (!s_Instance)
-            {
-                Debug.LogError("Cannot save ScriptableSingleton: no instance!");
-                return;
-            }
+            if (!s_Instance) return;
 
             string filePath = GetFilePath();
             if (!string.IsNullOrEmpty(filePath))

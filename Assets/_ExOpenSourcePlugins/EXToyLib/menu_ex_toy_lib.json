@@ -33,6 +33,20 @@
       "LocalPath": "Assets/_EXToy/Test",
       "GitURL_Path": "Assets/_EXToyLib/TestMatProject",
       "Intro": "测试简介"
+    },
+    {
+      "Name": "EX-GAS",
+      "Version": "1.1",
+      "Intro": "该项目为Unreal Engine的Gameplay Ability System的Unity实现，目前实现了部分功能，后续会继续完善。\n\n该项目完全开源，欢迎大家一起参与开发，提出建议，共同完善。可以基于该项目进行二次开发。",
+      "Tags": [
+        "GAS",
+        "Gameplay技能系统"
+      ],
+      "MenuPath": "EXToyLib/EX-GAS",
+      "UPM_Package": {
+        "name": "com.exhard.exgas",
+        "url": "https://github.com/No78Vino/gameplay-ability-system-for-unity.git?path=Assets/GAS"
+      }
     }
   ]
 }

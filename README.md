@@ -93,9 +93,13 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
   - Intro：插件介绍
   - Tags：插件描述用标签。这个是预留给过滤功能用的参数。现在还没做。
   - MenuPath：菜单目录树路径。
-    - s 
+    - 菜单目录是管理器左侧显示的目录。
+    - 字段本身拥有分类的功能
+    - 举例：仓库A/音频/音乐播放器，仓库A/音频/音效播放器
   - GitURL_Path：远端git仓库里插件文件夹的路径
   - LocalPath：本地工程安装插件的路径
-  - GitURL_Username:
-  - GitURL_RepoName:
-  - GitURL_Branch:
+  - GitURL_Username:插件所在仓库用户名。
+    - 如果不设置这个字段，那么会读取上方的默认用户名DefaultGit_UserName
+    - 这个字段是为了让插件搜罗更加方便，不必要求插件都在一个仓库里。
+  - GitURL_RepoName:插件所在仓库名。同上
+  - GitURL_Branch:插件所在仓库分支名。同上

@@ -96,3 +96,6 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
     - s 
   - GitURL_Path：远端git仓库里插件文件夹的路径
   - LocalPath：本地工程安装插件的路径
+  - GitURL_Username:
+  - GitURL_RepoName:
+  - GitURL_Branch:

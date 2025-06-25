@@ -30,5 +30,5 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
   - 网络测试：用于检测你当前的网络情况，DNS，git令牌是否都正常
   - 连接的仓库配置：相当于自定义收藏夹，他连接的是你自建的插件菜单JSON文件
     - git用户名，仓库名，分支名，远端菜单路径：这些是用于定位菜单文件的基础信息。实际是拼接出URL，格式：
-      https://raw.githubusercontent.com/用户名/仓库名/分支名/远端菜单路径?t=<timestamp>
+      https://raw.githubusercontent.com/用户名/仓库名/分支名/远端菜单路径
     - 本地菜单路径：下载菜单的本地路径

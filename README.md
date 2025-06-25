@@ -32,3 +32,62 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
     - git用户名，仓库名，分支名，远端菜单路径：这些是用于定位菜单文件的基础信息。实际是拼接出URL，格式：
       https://raw.githubusercontent.com/用户名/仓库名/分支名/远端菜单路径
     - 本地菜单路径：下载菜单的本地路径
+### Menu.json文件规范
+菜单json文件就是本管理器的核心了，相当于一个自定义收藏夹。
+结合例子来说明：
+```
+{
+  "Version": "1.0",
+  "Name": "测试插件库A",
+  "Owner": "作者A",
+  "Intro": "插件库简介A",
+  "DefaultGit_UserName": "authorA",
+  "DefaultGit_RepoName": "testRepoA",
+  "DefaultGit_Branch": "main",
+  "Plugins": [
+    {
+      "Name": "音乐播放器",
+      "Version": "1.0",
+      "Tags": [
+        "music",
+        "播放器"
+      ],
+      "MenuPath": "测试插件库A/音乐播放器",
+      "LocalPath": "Assets/TestRepoA/MusicPlayer",
+      "GitURL_Username": "authorB",
+      "GitURL_RepoName": "testRepoB",
+      "GitURL_Branch": "main",
+      "GitURL_Path": "Assets/MusicPlayer",
+      "Intro": "音乐播放器简介"
+    },
+    {
+      "Name": "龙卷风摧毁停车场模拟器",
+      "Version": "1.0",
+      "Tags": [
+        "模拟器",
+        "天气"
+      ],
+      "MenuPath": "测试插件库A/龙卷风摧毁停车场模拟器",
+      "LocalPath": "Assets/TestRepoA/Tornado",
+      "GitURL_Path": "Assets/Tornado",
+      "Intro": "龙卷风摧毁停车场模拟器简介"
+    }
+  ]
+}
+```
+- Version: 菜单版本号。这个版本号其实没什么实际作用，真更新了，还是以Plugins变化为准。
+- Name：这个收藏夹菜单的名字
+- Owner：菜单拥有者
+- Intro：菜单收藏简介
+- DefaultGit_UserName：默认git用户名。
+  - 插件Plugin的默认连接仓库地址。
+  - 如果插件没有标明具体的来源git仓库的信息，就会使用默认的信息
+  - 设计这个的意思就是，你的菜单收藏夹里，可以搜罗来自不同仓库，不同分支的仓库。
+  - 当然前提是这些仓库是public，或者token用户的私有仓库
+- DefaultGit_RepoName：默认git仓库名。同上
+- DefaultGit_Branch：默认git分支名。同上
+- Plugins：插件列表，每次有新的插件加入，只需要在这个列表里添加即可
+  - 来介绍一下Plugin的信息规范
+  - Name：插件名
+  - Version：插件版本号
+  - Tags：插件描述用标签。

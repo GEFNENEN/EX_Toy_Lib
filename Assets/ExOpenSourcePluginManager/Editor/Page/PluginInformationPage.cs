@@ -54,7 +54,6 @@ namespace ExOpenSource.Editor
             if (!result) return;
             
             InstallPlugin();
-            Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
         }
 
         [HorizontalGroup("Tab/本地信息/Buttons")]
@@ -98,7 +97,6 @@ namespace ExOpenSource.Editor
 
             // 重新下载插件
             InstallPlugin();
-            Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
         }
         
         [HorizontalGroup("Tab/本地信息/Buttons")]
@@ -183,7 +181,25 @@ namespace ExOpenSource.Editor
 
         private void InstallPlugin()
         {
-            ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
+            string user = string.IsNullOrEmpty(_pluginItem.GitURL_Username)
+                ? _menuConfig.DefaultGit_UserName
+                : _pluginItem.GitURL_Username;
+            string repoName = string.IsNullOrEmpty(_pluginItem.GitURL_RepoName) ?
+                _menuConfig.DefaultGit_RepoName :
+                _pluginItem.GitURL_RepoName;
+            string branch = string.IsNullOrEmpty(_pluginItem.GitURL_Branch)
+                ? _menuConfig.DefaultGit_Branch
+                : _pluginItem.GitURL_Branch;
+            
+            GitPluginUtility.DownloadPlugin(
+                user,
+                repoName,
+                branch,
+                _pluginItem.GitURL_Path,
+                _pluginItem.LocalPath,
+                ExOpenSourceNetworkHelper.Token());
+            
+            //ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
             UpmInstaller.AddUpmPackageList(_pluginItem.Dependencies);
         }
     }

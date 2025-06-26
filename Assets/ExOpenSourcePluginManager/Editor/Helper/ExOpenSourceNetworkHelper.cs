@@ -573,8 +573,22 @@ namespace ExOpenSource.Editor
         
         public static bool ExistFolder(string localPath)
         {
-            string fullPath = Path.Combine(Application.dataPath, "../", localPath);
             return Directory.Exists(localPath);
+        }
+        
+        /// <summary>
+        /// 文件夹是否为空
+        /// </summary>
+        /// <param name="localPath"></param>
+        /// <returns></returns>
+        public static bool IsFolderEmpty(string localPath)
+        {
+            if (!ExistFolder(localPath)) return true;
+
+            // 检查文件夹是否为空
+            var files = Directory.GetFiles(localPath);
+            var directories = Directory.GetDirectories(localPath);
+            return files.Length == 0 && directories.Length == 0;
         }
         
         public static void DeleteFolder(string localPath)

@@ -148,7 +148,7 @@ namespace ExOpenSource.Editor
 
         private bool ExistPlugin()
         {
-            return ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);
+            return !ExOpenSourceNetworkHelper.IsFolderEmpty(_pluginItem.LocalPath);
         }
 
         private bool ExistPluginGuide()

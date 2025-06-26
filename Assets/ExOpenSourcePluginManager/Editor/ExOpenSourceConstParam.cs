@@ -7,7 +7,7 @@
         public const string GIT_REPO_RAW_URL = "https://raw.githubusercontent.com/No78Vino/EX_Toy_Lib/main";
         
         public const string GIT_REPO_GUIDE_FILE_NAME = "GUIDE.md";
-        public const string DEFAULT_PLUGINS_ROOT_FOLDER = "Assets/_ExOpenSourcePlugins";
+        public const string DEFAULT_PLUGINS_ROOT_FOLDER = "Assets/ExOpenSource";
 
         public static readonly RepoInfo[] OfficialRepoInfos = new[]
         {
@@ -17,16 +17,8 @@
                 repoName = "EX_Toy_Lib",
                 branch = "main",
                 remoteMenuPath = "Assets/_EXToyLib/menu.json",
-                localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/EXToyLib/menu_ex_toy_lib.json"
+                localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/menu_ex.json"
             },
-            // new RepoInfo
-            // {
-            //     userName = "No78Vino",
-            //     repoName = "-Poof-Library",
-            //     branch = "main",
-            //     remoteMenuPath = "Assets/PoofLib/menu.json",
-            //     localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/PoofLib/menu_poof_lib.json"
-            // }
         };
         
         #region text

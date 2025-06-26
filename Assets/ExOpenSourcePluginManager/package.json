@@ -1,0 +1,19 @@
+{
+  "name": "com.exhard.exgas",
+  "version": "1.0",
+  "displayName": "EX Open Source Plugins Manager",
+  "unity": "2022.3",
+  "description": "EX开源插件管理器是针对github上unity插件的管理器，你可以自定义一个菜单来搜罗管理开源的插件。",
+  "license": "MIT",
+  "documentationUrl": "https://github.com/No78Vino/EX_Toy_Lib",
+  "dependencies": {},
+  "author": {
+    "name": "EX-Hard",
+    "email": "",
+    "url": "https://github.com/No78Vino"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/No78Vino/EX_Toy_Lib.git?path=Assets/ExOpenSourcePluginManager"
+  }
+}

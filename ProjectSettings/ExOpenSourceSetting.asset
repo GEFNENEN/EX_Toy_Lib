@@ -18,4 +18,4 @@ MonoBehaviour:
     repoName: EX_Toy_Lib
     branch: main
     remoteMenuPath: Assets/_EXToyLib/menu.json
-    localMenuPath: Assets/_ExOpenSourcePlugins/EXToyLib/menu_ex_toy_lib.json
+    localMenuPath: Assets/ExOpenSource/menu_ex.json

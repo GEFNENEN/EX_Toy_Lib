@@ -6,7 +6,10 @@
   "description": "EX开源插件管理器是针对github上unity插件的管理器，你可以自定义一个菜单来搜罗管理开源的插件。",
   "license": "MIT",
   "documentationUrl": "https://github.com/No78Vino/EX_Toy_Lib",
-  "dependencies": {},
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.editorcoroutines": "1.0.0"
+  },
   "author": {
     "name": "EX-Hard",
     "email": "",

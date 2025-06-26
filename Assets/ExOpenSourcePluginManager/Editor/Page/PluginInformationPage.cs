@@ -27,16 +27,7 @@ namespace ExOpenSource.Editor
         [DisplayAsString(Overflow = false,EnableRichText = true)]
         [ShowInInspector]
         [HideLabel]
-        private string LocalPath
-        {
-            get
-            {
-                if (_pluginItem.IsUpmPackage())
-                    return $"<color=white>UPM包名 : {_pluginItem.UPM_Package.name}\n" +
-                           $"UPM包Git Url : {_pluginItem.UPM_Package.url}</color>";
-                return $"<color=white>本地路径:{_pluginItem.LocalPath}</color>";
-            }
-        }
+        private string LocalPath => $"<color=white>本地路径:{_pluginItem.LocalPath}</color>";
 
         [TabGroup("Tab", "本地信息")]
         [PropertyOrder(0)]
@@ -44,9 +35,9 @@ namespace ExOpenSource.Editor
         [ShowInInspector]
         [HideLabel]
         private string State => $"<color=orange>当前状态:{GetState()}</color>";
-        
+
         [HorizontalGroup("Tab/本地信息/Buttons")]
-        [Button ("安装", ButtonSizes.Medium,Icon = SdfIconType.Download)]
+        [Button("安装", ButtonSizes.Medium, Icon = SdfIconType.Download)]
         [HideIf(nameof(ExistPlugin))]
         public void Install()
         {
@@ -61,18 +52,9 @@ namespace ExOpenSource.Editor
                 "安装将从远端Git仓库下载插件文件。",
                 "确认", "取消");
             if (!result) return;
-
-            if (_pluginItem.IsUpmPackage())
-            {
-                UpmGitInstaller.AddGitPackage(
-                    _pluginItem.UPM_Package.name,
-                    _pluginItem.UPM_Package.url);
-            }
-            else
-            {
-                ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
-                Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
-            }
+            
+            InstallPlugin();
+            Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
         }
 
         [HorizontalGroup("Tab/本地信息/Buttons")]
@@ -115,7 +97,7 @@ namespace ExOpenSource.Editor
             }
 
             // 重新下载插件
-            ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
+            InstallPlugin();
             Debug.Log($"开始尝试下载插件:{_pluginItem.Name}");
         }
         
@@ -168,14 +150,12 @@ namespace ExOpenSource.Editor
 
         private bool ExistPlugin()
         {
-            return _pluginItem.IsUpmPackage() 
-                ? UpmGitInstaller.IsInstalled(_pluginItem.UPM_Package.name) 
-                : ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);
+            return ExOpenSourceNetworkHelper.ExistFolder(_pluginItem.LocalPath);
         }
 
         private bool ExistPluginGuide()
         {
-            return !_pluginItem.IsUpmPackage() && ExOpenSourceNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
+            return ExOpenSourceNetworkHelper.ExistFile($"{_pluginItem.LocalPath}/{ExOpenSourceConstParam.GIT_REPO_GUIDE_FILE_NAME}");
         }
         
         private string GetState()
@@ -199,6 +179,12 @@ namespace ExOpenSource.Editor
                 RemoteFolderPath = _pluginItem.GitURL_Path,
                 LocalSavePath = _pluginItem.LocalPath
             };
+        }
+
+        private void InstallPlugin()
+        {
+            ExOpenSourceNetworkHelper.DownloadFolder(GetGitFolderDownloadConfig());
+            UpmInstaller.AddUpmPackageList(_pluginItem.Dependencies);
         }
     }
 }

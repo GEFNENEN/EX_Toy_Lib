@@ -1,6 +1,7 @@
 ﻿using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ExOpenSource.Editor
 {
@@ -13,7 +14,8 @@ namespace ExOpenSource.Editor
         [BoxGroup("插件基本信息")] [LabelText("版本")] [DisplayAsString]
         public string Version;
 
-        [BoxGroup("插件基本信息")] [LabelText("简介")] [ReadOnly] [TextArea(1, 20)]
+        [BoxGroup("插件基本信息")] [LabelText("简介")] 
+        [DisplayAsString(false,TextAlignment.Left,true)]
         public string Intro;
 
         [HideInInspector] public string MenuPath;
@@ -21,10 +23,10 @@ namespace ExOpenSource.Editor
         [BoxGroup("插件基本信息")] [LabelText("标签")] [ReadOnly] [ShowIf("@Tags != null && Tags.Length > 0")]
         public string[] Tags;
 
-        [BoxGroup("插件下载配置")] [LabelText("本地路径")] [DisplayAsString][HideIf(nameof(IsUpmPackage))]
+        [BoxGroup("插件下载配置")] [LabelText("本地路径")] [DisplayAsString]
         public string LocalPath;
 
-        [BoxGroup("插件下载配置")] [LabelText("远端Git仓库路径")] [DisplayAsString][HideIf(nameof(IsUpmPackage))]
+        [BoxGroup("插件下载配置")] [LabelText("远端Git仓库路径")] [DisplayAsString]
         public string GitURL_Path;
 
         [BoxGroup("插件下载配置")]
@@ -42,19 +44,8 @@ namespace ExOpenSource.Editor
         [BoxGroup("插件下载配置")] [LabelText("远端Git分支名")] [DisplayAsString] [ShowIf("@!string.IsNullOrEmpty(GitURL_Branch)")]
         public string GitURL_Branch;
 
-        [BoxGroup("插件下载配置")] [HideLabel] [ReadOnly] [ShowIf(nameof(IsUpmPackage))] [PropertyOrder(-1)]
-        public UPMPackage UPM_Package;
-
-
-        /// <summary>
-        /// 是否是UPM包类型的插件
-        /// </summary>
-        /// <returns></returns>
-        public bool IsUpmPackage()
-        {
-            return UPM_Package != null && !string.IsNullOrEmpty(UPM_Package.name) &&
-                   !string.IsNullOrEmpty(UPM_Package.url);
-        }
+        [BoxGroup("插件下载配置")] [LabelText("依赖")] [ReadOnly][HideIf("@Dependencies==null || Dependencies.Length == 0")]
+        public UPMPackage[] Dependencies;
     }
 
     [Serializable]
@@ -63,7 +54,7 @@ namespace ExOpenSource.Editor
         [LabelText("UPM包名")]
         public string name;
         
-        [LabelText("UPM包git URL")]
-        public string url;
+        [LabelText("UPM包version/git URL")]
+        public string version;
     }
 }

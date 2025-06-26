@@ -14,7 +14,7 @@
 2. 导入本插件，以下两种方式：
 - 使用Unity Package Manager安装
   - 在Unity Package Manager中添加git地址:https://github.com/No78Vino/EX_Toy_Lib.git?path=Assets/ExOpenSourcePluginManager
-- 使用git clone本仓库，或者直接下载压缩包.
+- 【推荐】使用git clone本仓库，或者直接下载压缩包.
   - 下载完项目后，将[Assets/ExOpenSourcePluginManager]文件夹拷贝到你的项目中
   - 然后再去Unity Package Manager中安装本插件依赖的Editor Coroutines工具库。
 
@@ -59,6 +59,12 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
       "GitURL_Branch": "main",
       "GitURL_Path": "Assets/MusicPlayer",
       "Intro": "音乐播放器简介"
+      "Dependencies": [
+        {   
+          "name":"com.unity.ugui",
+          "version":"1.0.0",
+        }
+      ]
     },
     {
       "Name": "龙卷风摧毁停车场模拟器",
@@ -103,7 +109,17 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
     - 这个字段是为了让插件搜罗更加方便，不必要求插件都在一个仓库里。
   - GitURL_RepoName:插件所在仓库名。同上
   - GitURL_Branch:插件所在仓库分支名。同上
-
+  - Dependencies: Package依赖。
+    - name:依赖包名。
+    - version:依赖包的版本号（或者git url）。
+    - 参数的例子，直接打开manifest.json就能看到，官方的包和版本怎么填，对应的name和version就怎么填。
+    - 插件用到的依赖库，需要自己明确需要哪些，然后填写对应的包名，包版本（或者git url）。
+    
+    > 唉，写这条的时候已经在狂喷Unity的幽默git网络连接了，因为多了一个package.json的校验，导致了网络连接稳定性极差。
+      非常奇怪啊，官方库里的包体下载比git下载稳定不知道多少倍。原本我是搞了个upm安装插件的字段的，原理很简单就是把包信息
+      写入manifest.json里，让unity自己触发package的下载。但是确确实实下载失败了太多次，远不如我直连git，直接下载资源。
+      所以呢，我放弃了走UPM下载git框架插件的流程。改为了dependency自己配置在plugin信息里。
+    
 ## EX插件仓库
 在“连接的仓库配置”的右边有个按钮【添加默认库】。
 这个默认库是我的EX插件库，算是给自己打广告吧。

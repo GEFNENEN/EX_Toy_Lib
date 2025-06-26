@@ -1,8 +1,8 @@
 {
   "Version": "0.1",
-  "Name": "EXToyLib",
+  "Name": "EXHard开源插件收藏",
   "Owner": "Ex-Hard",
-  "Intro": "EXToyLib收录了我平时想到，看到的一些玩具级别的小插件。",
+  "Intro": "我平日积累的插件，包括自己开发的插件和往上搜罗到的一些有意思的插件。",
   "DefaultGit_UserName": "No78Vino",
   "DefaultGit_RepoName": "EX_Toy_Lib",
   "DefaultGit_Branch": "main",
@@ -10,29 +10,31 @@
     {
       "Name": "贝塞尔子弹轨迹控制器",
       "Version": "1.0",
+      "Intro": "贝塞尔子弹轨迹控制器是一个用于控制物体运动轨迹的小插件，支持贝塞尔曲线的绘制和编辑。",
       "Tags": [
         "Toy",
         "物体运动"
       ],
-      "MenuPath": "EXToyLib/贝塞尔子弹轨迹控制器",
+      "MenuPath": "EXHard开源插件收藏/贝塞尔子弹轨迹控制器",
       "LocalPath": "Assets/_EXToyLib/Editor/EXToyLibMenu.cs",
       "GitURL_Username": "No78Vino",
       "GitURL_RepoName": "EX_Toy_Lib",
       "GitURL_Branch": "main",
       "GitURL_Path": "Assets/_EXToyLib",
-      "Intro": "贝塞尔子弹轨迹控制器是一个用于控制物体运动轨迹的小插件，支持贝塞尔曲线的绘制和编辑。"
+      "Dependencies": {}
     },
     {
       "Name": "测试目录",
       "Version": "1.0",
+      "Intro": "测试简介",
       "Tags": [
         "测试",
         "材质"
       ],
-      "MenuPath": "EXToyLib/测试mat",
+      "MenuPath": "EXHard开源插件收藏/测试mat",
       "LocalPath": "Assets/_EXToy/Test",
       "GitURL_Path": "Assets/_EXToyLib/TestMatProject",
-      "Intro": "测试简介"
+      "Dependencies": {}
     },
     {
       "Name": "EX-GAS",
@@ -42,11 +44,13 @@
         "GAS",
         "Gameplay技能系统"
       ],
-      "MenuPath": "EXToyLib/EX-GAS",
-      "UPM_Package": {
-        "name": "com.exhard.exgas",
-        "url": "https://github.com/No78Vino/gameplay-ability-system-for-unity.git?path=Assets/GAS"
-      }
+      "MenuPath": "EXHard开源插件收藏/EX-GAS/1.0(Mono版本)",
+      "LocalPath": "Assets/_EXPlugins/EX_GAS",
+      "GitURL_Username": "No78Vino",
+      "GitURL_RepoName": "gameplay-ability-system-for-unity",
+      "GitURL_Branch": "EX-GAS-1.0",
+      "GitURL_Path": "Assets/GAS",
+      "Dependencies": {}
     }
   ]
 }

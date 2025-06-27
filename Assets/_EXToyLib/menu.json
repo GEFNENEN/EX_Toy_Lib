@@ -20,7 +20,7 @@
       "MenuPath": "EXHard开源插件收藏/贝塞尔子弹轨迹控制器",
       "LocalPath": "Assets/ExOpenSource/BezierTrajectory",
       "GitURL_Path": "Assets/_EXToyLib/BezierTrajectory",
-      "Dependencies": {}
+      "Dependencies": []
     },
     {
       "Name": "EX-GAS",
@@ -37,7 +37,27 @@
       "GitURL_RepoName": "gameplay-ability-system-for-unity",
       "GitURL_Branch": "EX-GAS-1.0",
       "GitURL_Path": "Assets/GAS",
-      "Dependencies": {}
+      "Dependencies": []
+    },
+    {
+      "Name": "EX-Maid For UI (XUI)",
+      "Version": "1.0",
+      "Intro": "本插件集成了LoxodonFramework(MVVM)和FairyGUI，用于快速开发UI界面。适用于单人/小团队/小规模游戏开发。",
+      "Author": "Ex-Hard (git@ No78Vino)",
+      "Tags": [
+        "UI",
+        "Framework"
+      ],
+      "MenuPath": "EXHard开源插件收藏/UI/EX-Maid For UI",
+      "LocalPath": "Assets/ExOpenSource/EXMaidForUI",
+      "GitURL_RepoName": "EXMaidForFGUIandLoxondon",
+      "GitURL_Path": "",
+      "Dependencies": [
+        {
+          "name":"com.vovgou.loxodon-framework",
+          "version": "https://github.com/vovgou/loxodon-framework.git?path=Loxodon.Framework/Assets/LoxodonFramework"
+        }
+      ]
     }
   ]
 }

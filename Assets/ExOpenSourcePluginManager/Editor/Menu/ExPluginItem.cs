@@ -48,12 +48,12 @@ namespace ExOpenSource.Editor
 
         [BoxGroup("插件下载配置")] [LabelText("远端Git分支名")] [DisplayAsString] [ShowIf("@!string.IsNullOrEmpty(GitURL_Branch)")]
         public string GitURL_Branch;
-
+        
+        [BoxGroup("插件下载配置")][LabelText("说明书链接URL")][DisplayAsString][ShowIf("@!string.IsNullOrEmpty(IntroductionURL)")]
+        public string IntroductionURL;
+        
         [BoxGroup("插件下载配置")] [LabelText("依赖")] [ReadOnly][HideIf("@Dependencies==null || Dependencies.Length == 0")]
         public UPMPackage[] Dependencies;
-        
-        [BoxGroup("插件下载配置")][LabelText("说明书链接URL")][ShowIf("@!string.IsNullOrEmpty(IntroductionURL)")]
-        public string IntroductionURL;
     }
 
     [Serializable]

@@ -17,10 +17,20 @@
         "物体运动",
         "Bezier"
       ],
-      "MenuPath": "EXHard开源插件收藏/贝塞尔子弹轨迹控制器",
-      "LocalPath": "Assets/ExOpenSource/BezierTrajectory",
+      "MenuPath": "EXHard开源插件收藏/运动/贝塞尔子弹轨迹控制器",
+      "LocalPath": "Assets/Plugins/ExOpenSource/BezierTrajectory",
       "GitURL_Path": "Assets/_EXToyLib/BezierTrajectory",
       "Dependencies": []
+    },
+    {
+      "Name": "CharacterController重力实现",
+      "Version": "1.0",
+      "Intro": "Unity的Character Controller组件和rigidbody的重力位移是冲突的。所以Character Controller组件的重力需要额外实现。\n这个插件实现了一个简易的重力控制。",
+      "Author": "Ex-Hard (git@ No78Vino)",
+      "MenuPath": "EXHard开源插件收藏/运动/CharacterController重力实现",
+      "LocalPath": "Assets/Plugins/ExOpenSource/GravityForCharacterController",
+      "GitURL_Path": "Assets/_EXToyLib/GravityForCharacterController",
+      "IntroductionURL": "https://github.com/No78Vino/gameplay-ability-system-for-unity"
     },
     {
       "Name": "EX-GAS",
@@ -32,7 +42,7 @@
         "Gameplay技能系统"
       ],
       "MenuPath": "EXHard开源插件收藏/EX-GAS/1.0(Mono版本)",
-      "LocalPath": "Assets/ExOpenSource/GAS",
+      "LocalPath": "Assets/Plugins/ExOpenSource/GAS",
       "GitURL_Username": "No78Vino",
       "GitURL_RepoName": "gameplay-ability-system-for-unity",
       "GitURL_Branch": "EX-GAS-1.0",
@@ -50,7 +60,7 @@
         "Framework"
       ],
       "MenuPath": "EXHard开源插件收藏/UI/EX-Maid For UI",
-      "LocalPath": "Assets/ExOpenSource/EXMaidForUI",
+      "LocalPath": "Assets/Plugins/ExOpenSource/EXMaidForUI",
       "GitURL_RepoName": "EXMaidForFGUIandLoxondon",
       "GitURL_Path": "",
       "IntroductionURL": "https://github.com/No78Vino/EXMaidForFGUIandLoxondon",

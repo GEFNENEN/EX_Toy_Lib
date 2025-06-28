@@ -37,6 +37,7 @@
       "GitURL_RepoName": "gameplay-ability-system-for-unity",
       "GitURL_Branch": "EX-GAS-1.0",
       "GitURL_Path": "Assets/GAS",
+      "IntroductionURL": "https://github.com/No78Vino/gameplay-ability-system-for-unity",
       "Dependencies": []
     },
     {
@@ -52,6 +53,7 @@
       "LocalPath": "Assets/ExOpenSource/EXMaidForUI",
       "GitURL_RepoName": "EXMaidForFGUIandLoxondon",
       "GitURL_Path": "",
+      "IntroductionURL": "https://github.com/No78Vino/EXMaidForFGUIandLoxondon",
       "Dependencies": [
         {
           "name":"com.vovgou.loxodon-framework",

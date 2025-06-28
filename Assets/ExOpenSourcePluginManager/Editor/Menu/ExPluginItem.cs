@@ -51,6 +51,17 @@ namespace ExOpenSource.Editor
 
         [BoxGroup("插件下载配置")] [LabelText("依赖")] [ReadOnly][HideIf("@Dependencies==null || Dependencies.Length == 0")]
         public UPMPackage[] Dependencies;
+        
+        [HideInInspector]
+        public string IntroductionURL;
+        
+        [BoxGroup("插件基本信息")]
+        [Button(Icon = SdfIconType.Book,Name = "打开说明书")]
+        [ShowIf("@!string.IsNullOrEmpty(IntroductionURL)")]
+        public void OpenIntroductionURL()
+        {
+            Application.OpenURL(IntroductionURL);
+        }
     }
 
     [Serializable]

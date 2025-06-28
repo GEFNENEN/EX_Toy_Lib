@@ -59,6 +59,7 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
       "GitURL_Branch": "main",
       "GitURL_Path": "Assets/MusicPlayer",
       "Intro": "音乐播放器简介"
+      "IntroductionURL":"https://github.com/author/music-player",
       "Dependencies": [
         {   
           "name":"com.unity.ugui",
@@ -77,6 +78,7 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
       "LocalPath": "Assets/TestRepoA/Tornado",
       "GitURL_Path": "Assets/Tornado",
       "Intro": "龙卷风摧毁停车场模拟器简介"
+      
     }
   ]
 }
@@ -97,6 +99,7 @@ Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）
   - Name：插件名
   - Version：插件版本号
   - Intro：插件介绍
+  - IntroductionURL:说明链接地址。
   - Tags：插件描述用标签。这个是预留给过滤功能用的参数。现在还没做。
   - MenuPath：菜单目录树路径。
     - 菜单目录是管理器左侧显示的目录。

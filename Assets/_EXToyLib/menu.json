@@ -30,7 +30,7 @@
       "MenuPath": "EXHard开源插件收藏/运动/CharacterController重力实现",
       "LocalPath": "Assets/Plugins/ExOpenSource/GravityForCharacterController",
       "GitURL_Path": "Assets/_EXToyLib/GravityForCharacterController",
-      "IntroductionURL": "https://github.com/No78Vino/gameplay-ability-system-for-unity"
+      "IntroductionURL": "https://github.com/No78Vino/EX_Toy_Lib/blob/main/Assets/_EXToyLib/GravityForCharacterController/GUIDE.md"
     },
     {
       "Name": "EX-GAS",

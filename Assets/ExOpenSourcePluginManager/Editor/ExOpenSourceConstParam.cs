@@ -6,9 +6,6 @@
         public const string DEFAULT_MENU_PATH = "Assets/_EXToyLib/menu.json";
         public const string GIT_REPO_RAW_URL = "https://raw.githubusercontent.com/No78Vino/EX_Toy_Lib/main";
         
-        public const string GIT_REPO_GUIDE_FILE_NAME = "GUIDE.md";
-        public const string DEFAULT_PLUGINS_ROOT_FOLDER = "Assets/ExOpenSource";
-
         public static readonly RepoInfo[] OfficialRepoInfos = new[]
         {
             new RepoInfo
@@ -17,7 +14,7 @@
                 repoName = "EX_Toy_Lib",
                 branch = "main",
                 remoteMenuPath = "Assets/_EXToyLib/menu.json",
-                localMenuPath = DEFAULT_PLUGINS_ROOT_FOLDER + "/menu_ex.json"
+                localMenuPath = "Assets/Plugins/ExOpenSource/menu_ex.json"
             },
         };
         

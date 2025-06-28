@@ -167,18 +167,33 @@ namespace ExOpenSource.Editor
             {
                 EditorUtility.DisplayProgressBar("Git Plugin Manager", "Initializing repository...", 0.1f);
 
-                // 克隆仓库（不检出）
-                RunGitCommand(
-                    $"clone --depth 1 --filter=blob:none --no-checkout \"{authenticatedUrl}\" \"{tempPath}\"");
+                bool isRootPath = string.IsNullOrEmpty(relativePath) || relativePath == "/" || relativePath == "\\";
 
-                // 设置稀疏检出
-                RunGitCommand("sparse-checkout init --cone", tempPath);
-                RunGitCommand($"sparse-checkout set \"{relativePath}\"", tempPath);
+                if (isRootPath)
+                {
+                    // 根目录处理：直接克隆整个仓库
+                    RunGitCommand($"clone --depth 1 --filter=blob:none \"{authenticatedUrl}\" \"{tempPath}\"");
+    
+                    // 切换到目标版本
+                    if (!string.IsNullOrEmpty(targetBranch))
+                        RunGitCommand($"checkout {targetBranch}", tempPath);
+                }
+                else
+                {
 
-                // 检出指定版本或分支
-                EditorUtility.DisplayProgressBar("Git Plugin Manager", "Checking out files...", 0.5f);
-                string checkoutTarget = targetBranch;
-                RunGitCommand($"checkout {checkoutTarget}", tempPath);
+                    // 克隆仓库（不检出）
+                    RunGitCommand(
+                        $"clone --depth 1 --filter=blob:none --no-checkout \"{authenticatedUrl}\" \"{tempPath}\"");
+
+                    // 设置稀疏检出
+                    RunGitCommand("sparse-checkout init --cone", tempPath);
+                    RunGitCommand($"sparse-checkout set \"{relativePath}\"", tempPath);
+
+                    // 检出指定版本或分支
+                    EditorUtility.DisplayProgressBar("Git Plugin Manager", "Checking out files...", 0.5f);
+                    string checkoutTarget = targetBranch;
+                    RunGitCommand($"checkout {checkoutTarget}", tempPath);
+                }
 
                 // 移动文件到目标位置
                 EditorUtility.DisplayProgressBar("Git Plugin Manager", "Moving files...", 0.8f);
@@ -218,16 +233,15 @@ namespace ExOpenSource.Editor
                 int startIndex = "https://".Length;
                 return originalUrl.Insert(startIndex, $"{token}@");
             }
-            else if (originalUrl.StartsWith("http://"))
+
+            if (originalUrl.StartsWith("http://"))
             {
                 // 插入token: http://token@github.com/user/repo.git
                 int startIndex = "http://".Length;
                 return originalUrl.Insert(startIndex, $"{token}@");
             }
-            else
-            {
-                throw new ArgumentException("Token authentication only supported for HTTP/HTTPS URLs");
-            }
+
+            throw new ArgumentException("Token authentication only supported for HTTP/HTTPS URLs");
         }
 
         private static void RunGitCommand(string command, string workingDir = null)
@@ -246,7 +260,7 @@ namespace ExOpenSource.Editor
                     WindowStyle = ProcessWindowStyle.Hidden
                 };
 
-                UnityEngine.Debug.Log($"Executing: git {command}");
+                Debug.Log($"Executing: git {command}");
 
                 process.Start();
                 string output = process.StandardOutput.ReadToEnd();

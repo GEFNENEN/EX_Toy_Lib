@@ -252,6 +252,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.vovgou.loxodon-framework": {
+      "version": "https://github.com/vovgou/loxodon-framework.git?path=Loxodon.Framework/Assets/LoxodonFramework",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2165bc935302a996691c86f7fde1996c8fbdbfc8"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

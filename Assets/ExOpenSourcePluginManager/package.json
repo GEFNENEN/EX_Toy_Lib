@@ -1,6 +1,6 @@
 {
   "name": "com.exhard.exopensourcepluginmanager",
-  "version": "1.0",
+  "version": "1.0.0",
   "displayName": "EX Open Source Plugins Manager",
   "unity": "2022.3",
   "description": "EX开源插件管理器是针对github上unity插件的管理器，你可以自定义一个菜单来搜罗管理开源的插件。",

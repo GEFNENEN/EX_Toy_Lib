@@ -17,6 +17,9 @@
 - 【推荐】使用git clone本仓库，或者直接下载压缩包.
   - 下载完项目后，将[Assets/ExOpenSourcePluginManager]文件夹拷贝到你的项目中
   - 然后再去Unity Package Manager中安装本插件依赖的Editor Coroutines和newtonsoft-json工具库。
+  
+> 国内镜像：https://gitee.com/exhard/EX_Toy_Lib.git?path=Assets/ExOpenSourcePluginManager
+  镜像更新可能不及时，有需要可以去群里艾特我。
 
 ### 打开
 Unity顶部工具栏：EX_Tool -> EX开源插件管理器（Github）

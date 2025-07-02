@@ -183,7 +183,7 @@ namespace ExOpenSource.Editor
 
                     // 克隆仓库（不检出）
                     RunGitCommand(
-                        $"clone --depth 1 --filter=blob:none --no-checkout \"{authenticatedUrl}\" \"{tempPath}\"");
+                        $"clone --depth 1 --filter=blob:none --no-checkout --branch {targetBranch} \"{authenticatedUrl}\" \"{tempPath}\"");
 
                     // 设置稀疏检出
                     RunGitCommand("sparse-checkout init --cone", tempPath);
@@ -191,8 +191,8 @@ namespace ExOpenSource.Editor
 
                     // 检出指定版本或分支
                     EditorUtility.DisplayProgressBar("Git Plugin Manager", "Checking out files...", 0.5f);
-                    string checkoutTarget = targetBranch;
-                    RunGitCommand($"checkout {checkoutTarget}", tempPath);
+                    // string checkoutTarget = targetBranch;
+                    // RunGitCommand($"checkout {checkoutTarget}", tempPath);
                 }
 
                 // 移动文件到目标位置

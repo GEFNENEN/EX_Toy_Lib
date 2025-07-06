@@ -10,7 +10,7 @@ namespace ExOpenSource.Editor
 {
     public class ExOpenSourcePluginManagerWindow : OdinMenuEditorWindow
     {
-        [MenuItem("EX_Tools/EX开源插件管理器（Github）")]
+        [MenuItem("EXTool/EX开源插件管理器（Github）")]
         private static void OpenWindow()
         {
             var window = GetWindow<ExOpenSourcePluginManagerWindow>();

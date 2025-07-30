@@ -173,26 +173,25 @@ namespace ExOpenSource.Editor
                 {
                     // 根目录处理：直接克隆整个仓库
                     RunGitCommand($"clone --depth 1 --filter=blob:none \"{authenticatedUrl}\" \"{tempPath}\"");
-    
+
                     // 切换到目标版本
                     if (!string.IsNullOrEmpty(targetBranch))
                         RunGitCommand($"checkout {targetBranch}", tempPath);
                 }
                 else
                 {
-
                     // 克隆仓库（不检出）
                     RunGitCommand(
                         $"clone --depth 1 --filter=blob:none --no-checkout --branch {targetBranch} \"{authenticatedUrl}\" \"{tempPath}\"");
+                    EditorUtility.DisplayProgressBar("Git Plugin Manager", "Checking out files...", 0.5f);
 
                     // 设置稀疏检出
                     RunGitCommand("sparse-checkout init --cone", tempPath);
                     RunGitCommand($"sparse-checkout set \"{relativePath}\"", tempPath);
+                    EditorUtility.DisplayProgressBar("Git Plugin Manager", "Checking out files...", 0.6f);
 
-                    // 检出指定版本或分支
-                    EditorUtility.DisplayProgressBar("Git Plugin Manager", "Checking out files...", 0.5f);
-                    // string checkoutTarget = targetBranch;
-                    // RunGitCommand($"checkout {checkoutTarget}", tempPath);
+                    // 检出
+                    RunGitCommand($"checkout", tempPath);
                 }
 
                 // 移动文件到目标位置
@@ -211,6 +210,10 @@ namespace ExOpenSource.Editor
                 {
                     throw new DirectoryNotFoundException($"Directory not found in repository: {relativePath}");
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("DownloadGitRepository Error: " + e.Message);
             }
             finally
             {
@@ -260,7 +263,7 @@ namespace ExOpenSource.Editor
                     WindowStyle = ProcessWindowStyle.Hidden
                 };
 
-                Debug.Log($"Executing: git {command}");
+                Debug.Log($"Executing: `git {command}`, working directory: `{process.StartInfo.WorkingDirectory}`");
 
                 process.Start();
                 string output = process.StandardOutput.ReadToEnd();

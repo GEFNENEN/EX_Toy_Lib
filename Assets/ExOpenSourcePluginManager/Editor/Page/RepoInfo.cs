@@ -22,6 +22,7 @@ namespace ExOpenSource.Editor
         public string remoteMenuPath;
 
         [Space]
+        [Delayed]
         [LabelText("本地菜单路径")]
         [LabelWidth(150)]
         [PropertyOrder(2)]

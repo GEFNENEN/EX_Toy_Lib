@@ -32,5 +32,7 @@
         {
             elapsed = 0f;
         }
+
+        public virtual void OnInterrupt() {}
     }
 }

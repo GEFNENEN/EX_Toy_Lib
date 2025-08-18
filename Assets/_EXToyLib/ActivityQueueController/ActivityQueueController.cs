@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace EXToyLib
@@ -7,7 +8,15 @@ namespace EXToyLib
     {
         private static ActivityQueueController _instance;
 
+        private readonly Dictionary<int, ActivityQueue> _customUpdateActivityQueues = new();
+
+        private readonly Dictionary<int, ActivityQueue> _fixedUpdateActivityQueues = new();
+
+        private readonly Dictionary<int, ActivityQueue> _normalActivityQueues = new();
+
         private ActivityQueueControllerHost _host;
+
+        private readonly Dictionary<int, ActivityQueueTime> _id2TimeType = new();
 
         private ActivityQueueController()
         {
@@ -29,18 +38,121 @@ namespace EXToyLib
 
         public void OnUpdate()
         {
-            foreach (var (_,v) in _activityQueues)
-                if (v.Running) v.Update();
+            foreach (var (_, v) in _normalActivityQueues)
+                if (v.Running)
+                    v.Update();
         }
 
         public void OnFixedUpdate()
         {
-            foreach (var (_,v) in _fixedUpdateActivityQueues)
-                if (v.Running) v.Update();
+            foreach (var (_, v) in _fixedUpdateActivityQueues)
+                if (v.Running)
+                    v.Update();
+        }
+
+        public void OnCustomUpdate(float customDelta)
+        {
+            foreach (var (_, v) in _customUpdateActivityQueues)
+                if (v.Running)
+                    v.Update(customDelta);
+        }
+
+        public void RegisterActivityQueue(int id, ActivityQueueTime timeType = ActivityQueueTime.UpdateFrame)
+        {
+            if (_id2TimeType.ContainsKey(id))
+            {
+                Debug.LogWarning($"ActivityQueue with ID {id} already exists.");
+                return;
+            }
+
+            var queue = timeType switch
+            {
+                ActivityQueueTime.UpdateFrame => new ActivityQueue(id),
+                ActivityQueueTime.FixedUpdateFrame => new ActivityQueue(id, ActivityQueueTime.FixedUpdateFrame),
+                ActivityQueueTime.CustomTick => new ActivityQueue(id, ActivityQueueTime.CustomTick),
+                _ => throw new ArgumentOutOfRangeException(nameof(timeType), timeType, null)
+            };
+
+            // 注册后自动启动
+            queue.Run();
+            
+            switch (timeType)
+            {
+                case ActivityQueueTime.FixedUpdateFrame:
+                    _fixedUpdateActivityQueues[id] = queue;
+                    break;
+                case ActivityQueueTime.CustomTick:
+                    _customUpdateActivityQueues[id] = queue;
+                    break;
+                default:
+                    _normalActivityQueues[id] = queue;
+                    break;
+            }
+
+            _id2TimeType[id] = timeType;
+        }
+
+        public void UnregisterActivityQueue(int id)
+        {
+            if (_normalActivityQueues.ContainsKey(id))
+                _normalActivityQueues.Remove(id);
+            else if (_fixedUpdateActivityQueues.ContainsKey(id))
+                _fixedUpdateActivityQueues.Remove(id);
+            else if (_customUpdateActivityQueues.ContainsKey(id))
+                _customUpdateActivityQueues.Remove(id);
+            else
+                Debug.LogWarning($"No ActivityQueue found with ID {id}.");
+            _id2TimeType.Remove(id);
+        }
+
+        public ActivityQueue GetActivityQueue(int id)
+        {
+            if (_id2TimeType.TryGetValue(id, out var timeType))
+                switch (timeType)
+                {
+                    case ActivityQueueTime.UpdateFrame:
+                        if (_normalActivityQueues.TryGetValue(id, out var updateFrameQueue))
+                            return updateFrameQueue;
+                        break;
+                    case ActivityQueueTime.FixedUpdateFrame:
+                        if (_fixedUpdateActivityQueues.TryGetValue(id, out var fixedQueue))
+                            return fixedQueue;
+                        break;
+                    case ActivityQueueTime.CustomTick:
+                        if (_customUpdateActivityQueues.TryGetValue(id, out var customQueue))
+                            return customQueue;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+            Debug.LogWarning($"No ActivityQueue found with ID {id}.");
+            return null;
+        }
+
+        public void RunActivityQueue(int id)
+        {
+            var queue = GetActivityQueue(id);
+            queue?.Run();
         }
         
-        private Dictionary<int, ActivityQueue> _activityQueues = new Dictionary<int, ActivityQueue>();
+        public void StopActivityQueue(int id)
+        {
+            var queue = GetActivityQueue(id);
+            queue?.Stop();
+        }
         
-        private Dictionary<int, ActivityQueue> _fixedUpdateActivityQueues = new Dictionary<int, ActivityQueue>();
+        public void AddActivityToQueue(int queueId, BaseActivity activity,
+            ActivityAddFunction addFunction = ActivityAddFunction.Last, int addIndex = -1)
+        {
+            var queue = GetActivityQueue(queueId);
+            if (queue == null)
+            {
+                Debug.LogWarning($"No ActivityQueue found with ID {queueId}.");
+                return;
+            }
+
+            queue.AddActivity(activity, addFunction, addIndex);
+        }
     }
 }

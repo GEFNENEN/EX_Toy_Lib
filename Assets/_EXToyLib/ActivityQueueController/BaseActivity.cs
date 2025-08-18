@@ -18,9 +18,9 @@
         }
     
         // 更新活动状态
-        public virtual void Update(float delta)
+        public virtual void OnUpdate()
         {
-            elapsed += delta;
+            //elapsed += delta;
         }
     
         // 活动开始时的回调
@@ -38,5 +38,7 @@
         public virtual void OnInterrupt() {}
         
         public virtual void Dispose() {}
+
+        public void StarRunning() => Running = true;
     }
 }

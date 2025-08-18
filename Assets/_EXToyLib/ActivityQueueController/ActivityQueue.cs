@@ -23,17 +23,30 @@ namespace EXToyLib
         {
             if(!_running) return;
             
-            if(_activities.Count==0)return;
+            if(_activities.Count==0) return;
 
             var runningActivity = _activities[0];
+
+            if (!runningActivity.Running)
+            {
+                runningActivity.StarRunning();
+                runningActivity.OnStart();
+            }
             
-            // TODO 
-            //runningActivity.Update();
+            runningActivity.OnUpdate();
+            
+            if (!runningActivity.IsCompleted)
+            {
+                runningActivity.OnComplete();
+                _activities.RemoveAt(0);
+                runningActivity.Dispose();
+            }
         }
 
         public void Run() => _running = true;
         public void Stop() => _running = false;
 
+        
         public void AddActivity(BaseActivity activity,ActivityAddFunction addFunction = ActivityAddFunction.Last,int addIndex = 0)
         {
             switch (addFunction)

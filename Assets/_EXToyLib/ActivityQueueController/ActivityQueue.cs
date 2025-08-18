@@ -10,7 +10,7 @@ namespace EXToyLib
         
         private ActivityQueueTime _timeType;
 
-        private bool _running;
+        public bool Running { get; private set; }
 
         private List<BaseActivity> _activities = new List<BaseActivity>();
 
@@ -21,7 +21,7 @@ namespace EXToyLib
         
         public void Update()
         {
-            if(!_running) return;
+            if(!Running) return;
             
             if(_activities.Count==0) return;
 
@@ -43,8 +43,8 @@ namespace EXToyLib
             }
         }
 
-        public void Run() => _running = true;
-        public void Stop() => _running = false;
+        public void Run() => Running = true;
+        public void Stop() => Running = false;
 
         
         public void AddActivity(BaseActivity activity,ActivityAddFunction addFunction = ActivityAddFunction.Last,int addIndex = 0)

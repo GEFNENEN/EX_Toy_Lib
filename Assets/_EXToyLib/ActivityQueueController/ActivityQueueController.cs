@@ -29,10 +29,14 @@ namespace EXToyLib
 
         public void OnUpdate()
         {
+            foreach (var (_,v) in _activityQueues)
+                if (v.Running) v.Update();
         }
 
         public void OnFixedUpdate()
         {
+            foreach (var (_,v) in _fixedUpdateActivityQueues)
+                if (v.Running) v.Update();
         }
         
         private Dictionary<int, ActivityQueue> _activityQueues = new Dictionary<int, ActivityQueue>();

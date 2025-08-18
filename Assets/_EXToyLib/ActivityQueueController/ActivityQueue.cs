@@ -96,6 +96,10 @@ namespace EXToyLib
 
         public bool RemoveActivity(BaseActivity activity)
         {
+            if (activity.Running)
+            {
+                activity.OnInterrupt();
+            }
             return _activities.Remove(activity);
         }
     }

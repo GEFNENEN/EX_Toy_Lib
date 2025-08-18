@@ -5,7 +5,9 @@
         public string activityID;
         protected float duration;
         protected float elapsed;
-    
+        
+        public bool Running { get;private set; }
+        
         public bool IsCompleted { get { return elapsed >= duration; } }
     
         public BaseActivity(string id, float duration)
@@ -34,5 +36,7 @@
         }
 
         public virtual void OnInterrupt() {}
+        
+        public virtual void Dispose() {}
     }
 }

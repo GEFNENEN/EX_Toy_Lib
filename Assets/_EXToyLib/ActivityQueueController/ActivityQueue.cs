@@ -193,6 +193,7 @@ namespace EXToyLib
         /// <param name="interruptRunningActivity">是否打断播放中的活动</param>
         public void Clear(bool interruptRunningActivity = false)
         {
+            if(_activities.Count==0) return;
             if (interruptRunningActivity)
             {
                 Skip();

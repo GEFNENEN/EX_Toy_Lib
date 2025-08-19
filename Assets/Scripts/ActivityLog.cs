@@ -23,4 +23,10 @@ public class ActivityLog : BaseActivity
         Debug.Log($"Activity {ID} completed after {elapsed} seconds.");
         base.OnComplete();
     }
+
+    public override void OnInterrupt()
+    {
+        Debug.Log($"Activity {ID} interrupt after {elapsed} seconds.");
+        base.OnInterrupt();
+    }
 }

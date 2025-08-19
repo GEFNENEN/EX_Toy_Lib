@@ -20,10 +20,18 @@ namespace EXToyLib
 
         private ActivityQueueController()
         {
-            Host.Init();
+            Host.Init(this);
         }
 
-        public static ActivityQueueController Instance => _instance ??= new ActivityQueueController();
+        public static ActivityQueueController Instance
+        {
+            get
+            {
+                 _instance ??= new ActivityQueueController();
+                 _instance.CheckHost();
+                 return _instance;
+            }
+        }
 
         private ActivityQueueControllerHost Host
         {
@@ -34,6 +42,11 @@ namespace EXToyLib
                 _host = go.AddComponent<ActivityQueueControllerHost>();
                 return _host;
             }
+        }
+
+        private void CheckHost()
+        {
+            if(_host==null) Host.Init(this);
         }
         
         public void OnUpdate()

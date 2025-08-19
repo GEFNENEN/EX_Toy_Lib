@@ -19,5 +19,26 @@ namespace DefaultNamespace
             var activity = new ActivityLog(ActivityQueueController.GenerateNewActivityID(), 2.3f);
             ActivityQueueController.Instance.AddActivity(DefaultActivityQueueId,activity);
         }
+        
+        [Button]
+        public void ClearAllWithInterrupt()
+        {
+            var q = ActivityQueueController.Instance.GetQueue(DefaultActivityQueueId);
+            q.Clear(true);
+        }
+        
+        [Button]
+        public void ClearAll()
+        {
+            var q = ActivityQueueController.Instance.GetQueue(DefaultActivityQueueId);
+            q.Clear();
+        }
+        
+        [Button]
+        public void Skip()
+        {
+            var q = ActivityQueueController.Instance.GetQueue(DefaultActivityQueueId);
+            q.Skip();
+        }
     }
 }

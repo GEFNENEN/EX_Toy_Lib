@@ -5,6 +5,7 @@ namespace EXToyLib
     public class ActivityQueueControllerHost : MonoBehaviour
     {
         private bool _init;
+        private ActivityQueueController _ctrl;
 
         private void Awake()
         {
@@ -21,18 +22,19 @@ namespace EXToyLib
         {
             if (!_init) return;
 
-            ActivityQueueController.Instance.OnUpdate();
+            _ctrl.OnUpdate();
         }
 
         private void FixedUpdate()
         {
             if (!_init) return;
 
-            ActivityQueueController.Instance.OnFixedUpdate();
+            _ctrl.OnFixedUpdate();
         }
 
-        public void Init()
+        public void Init(ActivityQueueController controller)
         {
+            _ctrl = controller;
             _init = true;
         }
     }

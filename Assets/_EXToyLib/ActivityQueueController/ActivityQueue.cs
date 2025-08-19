@@ -40,7 +40,7 @@ namespace EXToyLib
 
             if (!runningActivity.Playing)
             {
-                runningActivity.StarRunning();
+                runningActivity.Start();
                 runningActivity.OnStart();
             }
 

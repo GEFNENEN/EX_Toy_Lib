@@ -15,18 +15,18 @@ public class ActivityLog : BaseActivity
     
     public override void OnUpdate()
     {
-        Debug.Log($"Activity {ID} is updating. Elapsed time: {elapsed}");
+        Debug.Log($"Activity {ID} is updating. Elapsed time: {_elapsed}");
     }
     
     public override void OnComplete()
     {
-        Debug.Log($"Activity {ID} completed after {elapsed} seconds.");
+        Debug.Log($"Activity {ID} completed after {_elapsed} seconds.");
         base.OnComplete();
     }
 
     public override void OnInterrupt()
     {
-        Debug.Log($"Activity {ID} interrupt after {elapsed} seconds.");
+        Debug.Log($"Activity {ID} interrupt after {_elapsed} seconds.");
         base.OnInterrupt();
     }
 }

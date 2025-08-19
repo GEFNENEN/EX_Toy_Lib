@@ -91,15 +91,15 @@
       "Dependencies": []
     },
     {
-      "Name": "活动队列管理器",
+      "Name": "时序活动队列管理器",
       "Version": "1.0",
-      "Intro": "活动队列管理器是一个用于时序执行活动需求的小框架",
+      "Intro": "时序活动队列管理器是一个用于时序执行活动需求的小框架",
       "Author": "Ex-Hard (git@ No78Vino)",
       "Tags": [
         "Sequence",
         "时序播放"
       ],
-      "MenuPath": "EXHard开源插件收藏/业务框架/活动队列管理器",
+      "MenuPath": "EXHard开源插件收藏/业务框架/时序活动队列管理器",
       "LocalPath": "Assets/Plugins/ExOpenSource/ActivityQueueController",
       "GitURL_Path": "Assets/_EXToyLib/ActivityQueueController",
       "IntroductionURL": "https://github.com/No78Vino/EX_Toy_Lib/blob/main/Assets/_EXToyLib/ActivityQueueController/GUIDE.md"

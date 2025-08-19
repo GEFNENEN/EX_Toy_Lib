@@ -215,7 +215,7 @@ namespace EXToyLib
         /// </summary>
         /// <param name="id">活动队列ID</param>
         /// <param name="interruptRunningActivity">是否打断播放中的活动</param>
-        public void CleaQueue(int id,bool interruptRunningActivity = false)
+        public void ClearQueue(int id,bool interruptRunningActivity = false)
         {
             var queue = GetQueue(id);
             queue?.Clear(interruptRunningActivity);

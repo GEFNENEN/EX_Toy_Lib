@@ -35,7 +35,7 @@ namespace EXToyLib
                 return _host;
             }
         }
-
+        
         public void OnUpdate()
         {
             foreach (var (_, v) in _normalActivityQueues)
@@ -57,7 +57,14 @@ namespace EXToyLib
                     v.Update(customDelta);
         }
 
-        public void RegisterActivityQueue(int id, ActivityQueueTime timeType = ActivityQueueTime.UpdateFrame)
+        /// <summary>
+        /// 注册活动队列
+        /// 注册后的活动队列，是默认运行的
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="timeType"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public void RegisterQueue(int id, ActivityQueueTime timeType = ActivityQueueTime.UpdateFrame)
         {
             if (_id2TimeType.ContainsKey(id))
             {
@@ -73,7 +80,7 @@ namespace EXToyLib
                 _ => throw new ArgumentOutOfRangeException(nameof(timeType), timeType, null)
             };
 
-            // 注册后自动启动
+            // 注册后自动运行
             queue.Run();
             
             switch (timeType)
@@ -92,20 +99,40 @@ namespace EXToyLib
             _id2TimeType[id] = timeType;
         }
 
-        public void UnregisterActivityQueue(int id)
+        /// <summary>
+        /// 注销活动队列
+        /// </summary>
+        /// <param name="id"></param>
+        public void UnregisterQueue(int id)
         {
             if (_normalActivityQueues.ContainsKey(id))
+            {
+                _normalActivityQueues[id].Clear(true);
                 _normalActivityQueues.Remove(id);
+            }
             else if (_fixedUpdateActivityQueues.ContainsKey(id))
+            {
+                _fixedUpdateActivityQueues[id].Clear(true);
                 _fixedUpdateActivityQueues.Remove(id);
+            }
             else if (_customUpdateActivityQueues.ContainsKey(id))
+            {
+                _customUpdateActivityQueues[id].Clear(true);
                 _customUpdateActivityQueues.Remove(id);
+            }
             else
                 Debug.LogWarning($"No ActivityQueue found with ID {id}.");
+
             _id2TimeType.Remove(id);
         }
 
-        public ActivityQueue GetActivityQueue(int id)
+        /// <summary>
+        /// 获取活动队列
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public ActivityQueue GetQueue(int id)
         {
             if (_id2TimeType.TryGetValue(id, out var timeType))
                 switch (timeType)
@@ -130,29 +157,69 @@ namespace EXToyLib
             return null;
         }
 
-        public void RunActivityQueue(int id)
+        /// <summary>
+        /// 运行队列
+        /// </summary>
+        /// <param name="id"></param>
+        public void RunQueue(int id)
         {
-            var queue = GetActivityQueue(id);
+            var queue = GetQueue(id);
             queue?.Run();
         }
         
-        public void StopActivityQueue(int id)
+        /// <summary>
+        /// 暂停队列
+        /// </summary>
+        /// <param name="id"></param>
+        public void StopQueue(int id)
         {
-            var queue = GetActivityQueue(id);
+            var queue = GetQueue(id);
             queue?.Stop();
         }
         
-        public void AddActivityToQueue(int queueId, BaseActivity activity,
+        /// <summary>
+        /// 添加活动
+        /// </summary>
+        /// <param name="queueId"></param>
+        /// <param name="activity"></param>
+        /// <param name="addFunction"></param>
+        /// <param name="addIndex"></param>
+        public void AddActivity(int queueId, BaseActivity activity,
             ActivityAddFunction addFunction = ActivityAddFunction.Last, int addIndex = -1)
         {
-            var queue = GetActivityQueue(queueId);
+            var queue = GetQueue(queueId);
             if (queue == null)
             {
                 Debug.LogWarning($"No ActivityQueue found with ID {queueId}.");
                 return;
             }
 
-            queue.AddActivity(activity, addFunction, addIndex);
+            queue.Add(activity, addFunction, addIndex);
         }
+
+        /// <summary>
+        /// 清空活动队列
+        /// </summary>
+        /// <param name="id">活动队列ID</param>
+        /// <param name="interruptRunningActivity">是否打断播放中的活动</param>
+        public void CleaQueue(int id,bool interruptRunningActivity = false)
+        {
+            var queue = GetQueue(id);
+            queue?.Clear(interruptRunningActivity);
+        }
+
+        #region Default Activity ID Generator
+
+        private static int CURRENT_ACTIVITY_GEN_ID = 0;
+
+        /// <summary>
+        /// 默认活动ID生成函数， 可以自定活动ID
+        /// </summary>
+        /// <returns></returns>
+        public static int GenerateNewActivityID()
+        {
+            return CURRENT_ACTIVITY_GEN_ID++;
+        }
+        #endregion
     }
 }

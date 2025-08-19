@@ -10,14 +10,14 @@ namespace DefaultNamespace
         [Button]
         public void OnInitDefaultActivityQueue()
         {
-            ActivityQueueController.Instance.RegisterActivityQueue(DefaultActivityQueueId);
+            ActivityQueueController.Instance.RegisterQueue(DefaultActivityQueueId);
         }
     
         [Button]
         public void OnAddLogActivity()
         {
-            var activity = new ActivityLog(1, 2.3f);
-            ActivityQueueController.Instance.AddActivityToQueue(DefaultActivityQueueId,activity);
+            var activity = new ActivityLog(ActivityQueueController.GenerateNewActivityID(), 2.3f);
+            ActivityQueueController.Instance.AddActivity(DefaultActivityQueueId,activity);
         }
     }
 }

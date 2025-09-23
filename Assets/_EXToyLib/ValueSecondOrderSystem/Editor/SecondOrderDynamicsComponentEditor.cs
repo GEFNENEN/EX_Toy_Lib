@@ -3,10 +3,10 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 
-[CustomEditor(typeof(SmoothFollow))]
-public class SmoothFollowEditor : Editor
+[CustomEditor(typeof(SecondOrderDynamicsComponent))]
+public class SecondOrderDynamicsComponentEditor : Editor
 {
-    private SmoothFollow _target;
+    private SecondOrderDynamicsComponent _target;
     private List<Vector2> _rawPoints = new List<Vector2>();
     private List<Vector2> _smoothedPoints = new List<Vector2>();
     private float _totalTime = 3f;
@@ -25,7 +25,7 @@ public class SmoothFollowEditor : Editor
 
     void OnEnable()
     {
-        _target = (SmoothFollow)target;
+        _target = (SecondOrderDynamicsComponent)target;
         _pointCount = Mathf.RoundToInt(_totalTime / _timeStep) + 1;
         UpdateCurveData();
     }

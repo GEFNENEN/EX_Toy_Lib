@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [System.Serializable]
-public class SmoothFollow : MonoBehaviour
+public class SecondOrderDynamicsComponent : MonoBehaviour
 {
     [Header("目标设置")]
     public Transform target; // 目标物体
@@ -22,7 +22,7 @@ public class SmoothFollow : MonoBehaviour
 
     private SecondOrderDynamics _dynamics; // 二阶动力学实例
 
-    void Start()
+    void OnEnable()
     {
         _dynamics = new SecondOrderDynamics(frequency, damping, scale, transform.position);
     }

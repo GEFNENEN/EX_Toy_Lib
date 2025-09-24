@@ -6,32 +6,31 @@ public class SecondOrderDynamicsComponent : MonoBehaviour
 {
     [Header("目标设置")]
     public Transform target; // 目标物体
-
-    [Header("动力学参数（曲线预览会实时更新）")]
-    [Tooltip("频率（Hz）：越高响应越快（推荐5-10）")]
-    [Range(0.1f, 6f)]
-    public float frequency = 5f;
     
-    [Tooltip("阻尼比：0=无阻尼（震荡），1=临界阻尼（无超调）")]
-    [Range(0f, 1f)]
-    public float damping = 0.5f;
+    private float _frequency = 5f;
+    private float _damping = 0.5f;
+    private float _scale = 1f;
     
-    [Tooltip("缩放因子：越大超调量越大（推荐1）")]
-    [Range(-10f, 10f)]
-    public float scale = 1f;
+    public float F => _frequency;
+    public float Z => _damping;
+    public float R => _scale;
+    
+    public void SetF(float f) => _frequency = f;
+    public void SetZ(float z) => _damping = z;
+    public void SetR(float r) => _scale = r;
 
     private SecondOrderDynamics _dynamics; // 二阶动力学实例
 
     void OnEnable()
     {
-        _dynamics = new SecondOrderDynamics(frequency, damping, scale, transform.position);
+        _dynamics = new SecondOrderDynamics(_frequency, _damping, _scale,transform.position);
     }
 
     void Update()
     {
         if (target == null) return;
-        Vector3 targetPos = target.position;
-        Vector3 smoothedPos = _dynamics.Update(Time.deltaTime, targetPos);
+        var targetPos = target.position;
+        var smoothedPos = _dynamics.Update(Time.deltaTime, targetPos);
         transform.position = smoothedPos;
     }
 }

@@ -38,9 +38,9 @@ public class SecondOrderDynamicsComponentEditor : Editor
         // 检测参数变化
         bool paramChanged = false;
         EditorGUI.BeginChangeCheck();
-        _target.frequency = EditorGUILayout.Slider("频率 (Hz)", _target.frequency, 0.1f, 7f);
-        _target.damping = EditorGUILayout.Slider("阻尼比", _target.damping, 0f, 1f);
-        _target.scale = EditorGUILayout.Slider("缩放因子", _target.scale, -10f, 10f);
+        _target.SetF(EditorGUILayout.Slider("频率 (Hz)", _target.F, 0.1f, 7f));
+        _target.SetZ(EditorGUILayout.Slider("阻尼比", _target.Z, 0f, 1f));
+        _target.SetR(EditorGUILayout.Slider("缩放因子", _target.R, -10f, 10f));
         if (EditorGUI.EndChangeCheck())
         {
             paramChanged = true;
@@ -79,9 +79,9 @@ public class SecondOrderDynamicsComponentEditor : Editor
 
         // 初始化动力学系统
         SecondOrderDynamics dynamics = new SecondOrderDynamics(
-            _target.frequency,
-            _target.damping,
-            _target.scale,
+            _target.F,
+            _target.Z,
+            _target.R,
             Vector3.zero
         );
 

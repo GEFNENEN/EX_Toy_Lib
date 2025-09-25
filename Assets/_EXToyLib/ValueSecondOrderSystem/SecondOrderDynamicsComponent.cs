@@ -5,11 +5,16 @@ namespace EXToyLib
     [System.Serializable]
     public class SecondOrderDynamicsComponent : MonoBehaviour
     {
-        [Header("目标设置")] 
-        public bool avator = true; // 目标物体
+        [HideInInspector]
+        public bool avator = true; // 是否使用替身
+        
+        [HideInInspector]
         public Transform target; // 目标物体
 
+        [HideInInspector]
         public bool autoUpdate;
+        
+        [HideInInspector]
         public SecondOrderDynamicValueType ValueType = SecondOrderDynamicValueType.Position;
 
         public float F => _dynamics.F;

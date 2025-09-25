@@ -40,10 +40,17 @@ namespace EXToyLib
             // 检测参数变化
             var paramChanged = false;
             EditorGUI.BeginChangeCheck();
+            _target.avator = EditorGUILayout.Toggle("使用替身", _target.avator);
+            if (_target.avator)
+            {
+                _target.target = EditorGUILayout.ObjectField("替身",_target.target,typeof(Transform),true) as Transform;
+            }
             _target.Dynamics.SetF(EditorGUILayout.Slider("频率 (Hz)", _target.F, 0.1f, 7f));
             _target.Dynamics.SetZ(EditorGUILayout.Slider("阻尼比", _target.Z, 0f, 1f));
             _target.Dynamics.SetR(EditorGUILayout.Slider("缩放因子", _target.R, -10f, 10f));
+            _target.ValueType = (SecondOrderDynamicValueType)EditorGUILayout.EnumPopup("影响属性", _target.ValueType);
 
+            _target.autoUpdate = EditorGUILayout.Toggle("自动更新参数", _target.autoUpdate);
             if (!_target.autoUpdate)
             {
                 if (GUILayout.Button("刷新参数")) _target.Dynamics.UpdateFactors();
@@ -288,7 +295,7 @@ namespace EXToyLib
             EditorGUI.DrawRect(new Rect(smoothedRect.x, smoothedRect.y + 8, 15, 2), _smoothedColor);
             GUI.Label(
                 new Rect(smoothedRect.x + 20, smoothedRect.y, 100, 20),
-                "平滑值",
+                "二次运动值",
                 new GUIStyle(EditorStyles.miniLabel) { normal = { textColor = _smoothedColor } }
             );
         }

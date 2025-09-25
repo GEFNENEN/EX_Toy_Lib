@@ -5,7 +5,9 @@ namespace EXToyLib
     [System.Serializable]
     public class SecondOrderDynamicsComponent : MonoBehaviour
     {
-        [Header("目标设置")] public Transform target; // 目标物体
+        [Header("目标设置")] 
+        public bool avator = true; // 目标物体
+        public Transform target; // 目标物体
 
         public bool autoUpdate;
         public SecondOrderDynamicValueType ValueType = SecondOrderDynamicValueType.Position;
@@ -19,26 +21,40 @@ namespace EXToyLib
 
         void Update()
         {
-            if (target == null) return;
-
             if (autoUpdate) _dynamics.UpdateFactors();
 
-            switch (ValueType)
-            {
-                case SecondOrderDynamicValueType.Position:
-                    transform.position = _dynamics.Update(Time.deltaTime, target.position); 
-                    break;
-                case SecondOrderDynamicValueType.Rotation:
-                    transform.localEulerAngles = _dynamics.Update(Time.deltaTime, target.localEulerAngles); 
-                    break;
-                case SecondOrderDynamicValueType.Scale:
-                    transform.localScale = _dynamics.Update(Time.deltaTime, target.localScale); 
-                    break;
-                case SecondOrderDynamicValueType.Custom:
-                default:
-                    break;
-            }
-            
+            if (avator && target != null)
+                switch (ValueType)
+                {
+                    case SecondOrderDynamicValueType.Position:
+                        transform.position = _dynamics.Update(Time.deltaTime, target.position);
+                        break;
+                    case SecondOrderDynamicValueType.Rotation:
+                        transform.localEulerAngles = _dynamics.Update(Time.deltaTime, target.localEulerAngles);
+                        break;
+                    case SecondOrderDynamicValueType.Scale:
+                        transform.localScale = _dynamics.Update(Time.deltaTime, target.localScale);
+                        break;
+                    case SecondOrderDynamicValueType.Custom:
+                    default:
+                        break;
+                }
+            else
+                switch (ValueType)
+                {
+                    case SecondOrderDynamicValueType.Position:
+                        transform.position = _dynamics.Update(Time.deltaTime);
+                        break;
+                    case SecondOrderDynamicValueType.Rotation:
+                        transform.localEulerAngles = _dynamics.Update(Time.deltaTime);
+                        break;
+                    case SecondOrderDynamicValueType.Scale:
+                        transform.localScale = _dynamics.Update(Time.deltaTime);
+                        break;
+                    case SecondOrderDynamicValueType.Custom:
+                    default:
+                        break;
+                }
         }
     }
 }

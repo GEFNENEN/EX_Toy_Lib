@@ -115,26 +115,7 @@ namespace EXToyLib
         
         public Vector3 Update(float deltaTime, Vector3? targetVelocity = null)
         {
-            var targetInput = _selfInput;
-            // 1. 估计目标输入速度（若未提供）
-            Vector3 estimatedVelocity = targetVelocity ?? (targetInput - _previousInput) / deltaTime;
-            _previousInput = targetInput; // 更新输入历史
-
-            // 2. 计算稳定的k2值（k2_stable）：核心改进点
-            // 公式来源：离散时间二阶系统的稳定性条件（确保特征根在单位圆内）
-            // k2_stable = max(k2, 1.1*(T²/4 + T*k1/2))，其中1.1是安全裕度
-            float tSquaredOver4 = deltaTime * deltaTime / 4;
-            float tK1Over2 = deltaTime * _k1 / 2;
-            float k2Stable = Mathf.Max(_k2, 1.1f * (tSquaredOver4 + tK1Over2));
-
-            // 3. 数值积分更新状态（使用k2_stable代替原k2）
-            _currentOutput += deltaTime * _outputVelocity; // 位置积分（y += T*yd）
-            _outputVelocity += deltaTime *
-                               (targetInput + _k3 * estimatedVelocity - _currentOutput - _k1 * _outputVelocity) /
-                               k2Stable; // 速度积分（yd += T*(x + k3*xd - y - k1*yd)/k2_stable）
-
-            // 4. 返回平滑后的输出
-            return _currentOutput;
+            return Update(deltaTime, _selfInput, targetVelocity);
         }
     }
 }

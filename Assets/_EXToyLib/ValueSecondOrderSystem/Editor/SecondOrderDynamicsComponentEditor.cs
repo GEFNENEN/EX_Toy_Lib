@@ -2,11 +2,12 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using Sirenix.OdinInspector.Editor; // 添加Odin编辑器命名空间
 
 namespace EXToyLib
 {
     [CustomEditor(typeof(SecondOrderDynamicsComponent))]
-    public class SecondOrderDynamicsComponentEditor : Editor
+    public class SecondOrderDynamicsComponentEditor : OdinEditor // 继承自OdinEditor
     {
         private Rect _curveRect;
         private readonly float _lineWidth = 1.5f;
@@ -34,30 +35,19 @@ namespace EXToyLib
 
         public override void OnInspectorGUI()
         {
-            serializedObject.Update();
-            DrawDefaultInspector();
+            // 调用基类绘制Odin属性
+            base.OnInspectorGUI();
 
             // 检测参数变化
-            var paramChanged = false;
-            EditorGUI.BeginChangeCheck();
-            _target.avator = EditorGUILayout.Toggle("使用替身", _target.avator);
-            if (_target.avator)
+            bool paramChanged = false;
+            var targetComponent = this.serializedObject.targetObject as SecondOrderDynamicsComponent;
+            
+            // 检查频率参数变化
+            if (EditorGUI.EndChangeCheck())
             {
-                _target.target = EditorGUILayout.ObjectField("替身",_target.target,typeof(Transform),true) as Transform;
+                paramChanged = true;
             }
-            _target.Dynamics.SetF(EditorGUILayout.Slider("频率 (Hz)", _target.F, 0.1f, 7f));
-            _target.Dynamics.SetZ(EditorGUILayout.Slider("阻尼比", _target.Z, 0f, 1f));
-            _target.Dynamics.SetR(EditorGUILayout.Slider("缩放因子", _target.R, -10f, 10f));
-            _target.ValueType = (SecondOrderDynamicValueType)EditorGUILayout.EnumPopup("影响属性", _target.ValueType);
-
-            _target.autoUpdate = EditorGUILayout.Toggle("自动更新参数", _target.autoUpdate);
-            if (!_target.autoUpdate)
-            {
-                if (GUILayout.Button("刷新参数")) _target.Dynamics.UpdateFactors();
-            }
-
-            if (EditorGUI.EndChangeCheck()) paramChanged = true;
-
+            
             // 参数变化时更新曲线
             if (paramChanged) UpdateCurveData();
 
@@ -88,9 +78,9 @@ namespace EXToyLib
 
             // 初始化动力学系统
             var dynamics = new SecondOrderDynamics();
-            dynamics.Set(_target.F,
-                _target.Z,
-                _target.R,
+            dynamics.Set(_target.Frequency,
+                _target.Damping,
+                _target.Scale,
                 Vector3.zero);
 
             // 重置动力学状态

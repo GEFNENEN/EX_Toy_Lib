@@ -185,13 +185,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed365a8ea67d499bb39d0c33c533ec7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avator: 1
-  target: {fileID: 236026294}
-  autoUpdate: 0
-  ValueType: 0
-  Frequency: 1
-  Damping: 1
-  Scale: 0
+  instances:
+  - avator: 1
+    target: {fileID: 236026294}
+    autoUpdate: 1
+    ValueType: 0
+    Frequency: 1.26
+    Damping: 1
+    Scale: 4.4
+  - avator: 1
+    target: {fileID: 236026294}
+    autoUpdate: 1
+    ValueType: 1
+    Frequency: 0.66
+    Damping: 0.33
+    Scale: 0.27
+  drawCurve: 1
+  drawCurveIndex: 0
 --- !u!23 &430777633
 MeshRenderer:
   m_ObjectHideFlags: 0

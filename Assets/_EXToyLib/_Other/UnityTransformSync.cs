@@ -18,20 +18,23 @@ namespace _EXToyLib._Other
         private void Update()
         {
             if (target == null) return;
-            switch (_dynamics.ValueType)
+            foreach (var inst in _dynamics.instances)
             {
-                case SecondOrderDynamicValueType.Position:
-                    _dynamics.Dynamics.SetInput(target.position);
-                    break;
-                case SecondOrderDynamicValueType.Rotation:
-                    _dynamics.Dynamics.SetInput(target.localEulerAngles);
-                    break;
-                case SecondOrderDynamicValueType.Scale:
-                    _dynamics.Dynamics.SetInput(target.localScale);
-                    break;
-                case SecondOrderDynamicValueType.Custom:
-                default:
-                    break;
+                switch (inst.ValueType)
+                {
+                    case SecondOrderDynamicValueType.Position:
+                        inst.Dynamics.SetInput(target.position);
+                        break;
+                    case SecondOrderDynamicValueType.Rotation:
+                        inst.Dynamics.SetInput(target.localEulerAngles);
+                        break;
+                    case SecondOrderDynamicValueType.Scale:
+                        inst.Dynamics.SetInput(target.localScale);
+                        break;
+                    case SecondOrderDynamicValueType.Custom:
+                    default:
+                        break;
+                }
             }
         }
     }

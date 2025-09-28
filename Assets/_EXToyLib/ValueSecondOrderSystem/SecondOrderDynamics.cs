@@ -1,16 +1,15 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace EXToyLib
 {
+    [Serializable]
     public class SecondOrderDynamics
     {
         private float _frequency = 1;
         private float _damping = 1;
         private float _scale = 0;
-        public float F => _frequency;
-        public float Z => _damping;
-        public float R => _scale;
 
         public void SetF(float f) => _frequency = f;
         public void SetZ(float z) => _damping = z;

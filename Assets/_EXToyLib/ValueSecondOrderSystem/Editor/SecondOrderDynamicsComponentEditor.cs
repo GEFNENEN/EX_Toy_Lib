@@ -26,6 +26,7 @@ namespace EXToyLib
         private readonly float _timeStep = 0.02f;
         private readonly float _totalTime = 3f;
 
+        private SecondOrderDynamicInstance _drawInst;
         private void OnEnable()
         {
             _target = (SecondOrderDynamicsComponent)target;
@@ -39,33 +40,30 @@ namespace EXToyLib
             base.OnInspectorGUI();
 
             // 检测参数变化
-            bool paramChanged = false;
-            var targetComponent = this.serializedObject.targetObject as SecondOrderDynamicsComponent;
-            
-            // 检查频率参数变化
-            if (EditorGUI.EndChangeCheck())
-            {
-                paramChanged = true;
-            }
+            bool paramChanged = EditorGUI.EndChangeCheck();
             
             // 参数变化时更新曲线
             if (paramChanged) UpdateCurveData();
 
             // 绘制曲线预览区域
-            EditorGUILayout.Space(15);
-            EditorGUILayout.LabelField("阶跃响应曲线预览", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox($"X轴范围: {_minX:F2}-{_maxX:F2}s | Y轴范围: {_minY:F2}-{_maxY:F2}", MessageType.Info);
-
-            _curveRect = GUILayoutUtility.GetRect(400, 200);
-
-            if (Event.current.type == EventType.Repaint)
+            if (_target.drawCurve && _target.drawCurveIndex >= 0 && _target.drawCurveIndex < _target.instances.Count)
             {
-                GUI.BeginClip(_curveRect);
-                GL.PushMatrix();
-                GL.Clear(true, false, new Color(0.15f, 0.15f, 0.15f));
-                DrawCurvePreview(new Rect(0, 0, _curveRect.width, _curveRect.height));
-                GL.PopMatrix();
-                GUI.EndClip();
+                EditorGUILayout.Space(15);
+                EditorGUILayout.LabelField("阶跃响应曲线预览", EditorStyles.boldLabel);
+                EditorGUILayout.HelpBox($"X轴范围: {_minX:F2}-{_maxX:F2}s | Y轴范围: {_minY:F2}-{_maxY:F2}",
+                    MessageType.Info);
+
+                _curveRect = GUILayoutUtility.GetRect(400, 200);
+
+                if (Event.current.type == EventType.Repaint)
+                {
+                    GUI.BeginClip(_curveRect);
+                    GL.PushMatrix();
+                    GL.Clear(true, false, new Color(0.15f, 0.15f, 0.15f));
+                    DrawCurvePreview(new Rect(0, 0, _curveRect.width, _curveRect.height));
+                    GL.PopMatrix();
+                    GUI.EndClip();
+                }
             }
 
             serializedObject.ApplyModifiedProperties();
@@ -76,11 +74,15 @@ namespace EXToyLib
             _rawPoints.Clear();
             _smoothedPoints.Clear();
 
+            if (!_target.drawCurve || _target.drawCurveIndex < 0 ||
+                _target.drawCurveIndex >= _target.instances.Count) return;
+            
             // 初始化动力学系统
             var dynamics = new SecondOrderDynamics();
-            dynamics.Set(_target.Frequency,
-                _target.Damping,
-                _target.Scale,
+            var selectedTarget = _target.instances[_target.drawCurveIndex];
+            dynamics.Set(selectedTarget.Frequency,
+                selectedTarget.Damping,
+                selectedTarget.Scale,
                 Vector3.zero);
 
             // 重置动力学状态

@@ -45,6 +45,7 @@ namespace EXToyLib
         //
         [ShowInInspector]
         [ListDrawerSettings(AlwaysAddDefaultValue = true)]
+        [LabelText("二阶运动实例队列")]
         public List<SecondOrderDynamicInstance> instances = new List<SecondOrderDynamicInstance>();
 
         [Title("预览")]

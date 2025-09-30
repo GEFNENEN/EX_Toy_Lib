@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 430777634}
   - component: {fileID: 430777633}
   - component: {fileID: 430777632}
+  - component: {fileID: 430777636}
   m_Layer: 0
   m_Name: test_second_order
   m_TagString: Untagged
@@ -186,14 +187,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instances:
-  - avator: 1
+  - avator: 0
     target: {fileID: 236026294}
     autoUpdate: 1
     ValueType: 0
     Frequency: 1.26
     Damping: 1
     Scale: 4.4
-  - avator: 1
+  - avator: 0
     target: {fileID: 236026294}
     autoUpdate: 1
     ValueType: 1
@@ -267,6 +268,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &430777636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 430777631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b1bcc2fe409427eb9feac3854a10e99, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 236026294}
 --- !u!1 &451691223
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,7 +26,7 @@ namespace ExOpenSource.Editor
             var setting = ExOpenSourcePluginManagerSetting.Instance;
             return setting.ReadToken();
         }
-        
+
         /// <summary>
         /// 下载单个文件
         /// </summary>
@@ -51,12 +51,12 @@ namespace ExOpenSource.Editor
 
         // 当前下载状态
         private static PLDownloadState currentState = PLDownloadState.Ready;
-        
+
         /// <summary>
         /// 文件夹下载上下文
         /// </summary>
         private static FolderDownloadContext folderContext;
-        
+
         /// <summary>
         /// 下载单个文件的协程
         /// </summary>
@@ -137,8 +137,20 @@ namespace ExOpenSource.Editor
                             Directory.CreateDirectory(directory);
                         }
 
+                        // 如果目标文件存在且为只读，先恢复为普通以便覆盖
+                        if (File.Exists(fileResult.LocalPath))
+                        {
+                            var attrs = File.GetAttributes(fileResult.LocalPath);
+                            if ((attrs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                                File.SetAttributes(fileResult.LocalPath, attrs & ~FileAttributes.ReadOnly);
+                        }
+
                         // 写入文件
                         File.WriteAllBytes(fileResult.LocalPath, request.downloadHandler.data);
+
+                        // 设置为只读
+                        File.SetAttributes(fileResult.LocalPath, File.GetAttributes(fileResult.LocalPath) | FileAttributes.ReadOnly);
+
                         fileResult.FileSize = request.downloadHandler.data.Length;
                         fileResult.IsSuccess = true;
 
@@ -190,7 +202,7 @@ namespace ExOpenSource.Editor
             currentState = PLDownloadState.Ready;
             NotifyStateChange();
         }
-        
+
         /// <summary>
         ///  下载整个文件夹的协程
         /// </summary>
@@ -208,7 +220,7 @@ namespace ExOpenSource.Editor
 
             // 开始扫描文件夹
             yield return ScanFolderRecursive(folderContext);
-            
+
             // 开始下载文件
             currentState = PLDownloadState.DownloadingFile;
             NotifyStateChange();
@@ -269,7 +281,7 @@ namespace ExOpenSource.Editor
                 {
                     yield return null; // 等待请求完成
                 }
-                
+
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     context.ErrorMessage = $"扫描文件夹失败: {request.error}";
@@ -277,43 +289,44 @@ namespace ExOpenSource.Editor
                 }
 
                 // 解析JSON响应
-                    string json = request.downloadHandler.text;
-                    Debug.Log($"GIT JSON: {json}");
-                    var items = ParseGitHubItems(json);
+                string json = request.downloadHandler.text;
+                Debug.Log($"GIT JSON: {json}");
+                var items = ParseGitHubItems(json);
 
-                    if (items == null || items.Length == 0)
+                if (items == null || items.Length == 0)
+                {
+                    context.ErrorMessage = "文件夹为空";
+                    yield break;
+                }
+
+                // 处理扫描结果
+                foreach (var item in items)
+                {
+                    if (item.type == "file")
                     {
-                        context.ErrorMessage = "文件夹为空";
-                        yield break;
-                    }
+                        // 添加到文件列表
+                        var fileInfo = new PLFileResult
+                        {
+                            RemotePath = item.path,
+                            LocalPath = Path.Combine(context.Config.LocalSavePath, item.name),
+                            FileSize = item.size
+                        };
 
-                    // 处理扫描结果
-                    foreach (var item in items)
+                        context.FileResults.Add(fileInfo);
+                        context.TotalFiles++;
+                    }
+                    else if (item.type == "dir")
                     {
-                        if (item.type == "file")
-                        {
-                            // 添加到文件列表
-                            var fileInfo = new PLFileResult
-                            {
-                                RemotePath = item.path,
-                                LocalPath = Path.Combine(context.Config.LocalSavePath, item.name),
-                                FileSize = item.size
-                            };
-
-                            context.FileResults.Add(fileInfo);
-                            context.TotalFiles++;
-                        }
-                        else if (item.type == "dir")
-                        {
-                            // 递归扫描子文件夹
-                            context.Config.RemoteFolderPath = item.path;
-                            yield return ScanFolderRecursive(context);
-                        }
+                        // 递归扫描子文件夹
+                        context.Config.RemoteFolderPath = item.path;
+                        yield return ScanFolderRecursive(context);
                     }
+                }
+
                 yield return null;
             }
         }
-        
+
         /// <summary>
         ///  下载文件列表中的所有文件
         /// </summary>
@@ -391,8 +404,20 @@ namespace ExOpenSource.Editor
                                 Directory.CreateDirectory(directory);
                             }
 
+                            // 如果目标文件存在且为只读，先恢复为普通以便覆盖
+                            if (File.Exists(file.LocalPath))
+                            {
+                                var attrs = File.GetAttributes(file.LocalPath);
+                                if ((attrs & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                                    File.SetAttributes(file.LocalPath, attrs & ~FileAttributes.ReadOnly);
+                            }
+
                             // 写入文件
                             File.WriteAllBytes(file.LocalPath, request.downloadHandler.data);
+
+                            // 设置为只读
+                            File.SetAttributes(file.LocalPath, File.GetAttributes(file.LocalPath) | FileAttributes.ReadOnly);
+
                             file.IsSuccess = true;
                             context.SuccessCount++;
                         }
@@ -477,20 +502,20 @@ namespace ExOpenSource.Editor
                 case PLDownloadState.Ready:
                     Debug.Log("准备就绪");
                     break;
-                
+
                 case PLDownloadState.ScanningFolder:
                     Debug.Log("扫描远程文件夹...");
                     break;
-                
+
                 case PLDownloadState.DownloadingFile:
                     Debug.Log("开始下载文件...");
                     break;
-                
+
                 case PLDownloadState.Completed:
                     Debug.Log("下载完成");
                     EditorUtility.ClearProgressBar();
                     break;
-                
+
                 case PLDownloadState.Failed:
                     Debug.Log("下载失败");
                     EditorUtility.ClearProgressBar();
@@ -507,7 +532,7 @@ namespace ExOpenSource.Editor
             string info = $"{progress.Progress:P} - " +
                           $"{FormatBytes(progress.DownloadedBytes)} / {FormatBytes(progress.TotalBytes)} - " +
                           $"{FormatBytes((long)progress.Speed)}/s";
-        
+
             EditorUtility.DisplayProgressBar(title, info, progress.Progress);
             //Repaint(); // 确保窗口刷新
         }
@@ -519,7 +544,7 @@ namespace ExOpenSource.Editor
             string info = $"文件: {progress.DownloadedFiles}/{progress.TotalFiles} " +
                           $"({progress.OverallProgress:P}) - " +
                           $"当前: {progress.CurrentFile}";
-        
+
             EditorUtility.DisplayProgressBar(title, info, progress.OverallProgress);
         }
 
@@ -530,7 +555,7 @@ namespace ExOpenSource.Editor
             Debug.Log($"下载完成: {result.Message}");
             Debug.Log($"总文件: {result.TotalFiles}, 成功: {result.SuccessCount}, 失败: {result.FailCount}");
             Debug.Log($"总耗时: {result.TotalTime:0.00}秒");
-        
+
             // 显示通知
             EditorWindow.focusedWindow.ShowNotification(result.IsSuccess
                 ? new GUIContent($"下载成功! {result.SuccessCount} 个文件已下载")
@@ -548,11 +573,11 @@ namespace ExOpenSource.Editor
                     }
                 }
             }
-        
+
             // 刷新资源数据库
             AssetDatabase.Refresh();
             EditorUtility.ClearProgressBar();
-            
+
             ExOpenSourcePluginManagerWindow.RefreshMenuTree();
         }
 
@@ -561,21 +586,21 @@ namespace ExOpenSource.Editor
             string[] sizes = { "B", "KB", "MB", "GB" };
             int order = 0;
             double len = bytes;
-        
+
             while (len >= 1024 && order < sizes.Length - 1)
             {
                 order++;
                 len /= 1024;
             }
-        
+
             return $"{len:0.##} {sizes[order]}";
         }
-        
+
         public static bool ExistFolder(string localPath)
         {
             return Directory.Exists(localPath);
         }
-        
+
         /// <summary>
         /// 文件夹是否为空
         /// </summary>
@@ -590,7 +615,7 @@ namespace ExOpenSource.Editor
             var directories = Directory.GetDirectories(localPath);
             return files.Length == 0 && directories.Length == 0;
         }
-        
+
         public static void DeleteFolder(string localPath)
         {
             if (AssetDatabase.IsValidFolder(localPath))
@@ -605,13 +630,13 @@ namespace ExOpenSource.Editor
                 Debug.LogWarning($"文件夹不存在或路径无效: {localPath}");
             }
         }
-        
+
         public static bool ExistFile(string localPath)
         {
             string fullPath = Path.Combine(Application.dataPath, "../", localPath);
             return File.Exists(fullPath);
         }
-        
+
         #endregion
 
         #region 内部类和数据结构
